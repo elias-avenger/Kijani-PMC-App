@@ -33,13 +33,13 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("images/bg.png"),
-            alignment: Alignment.bottomCenter,
-            fit: BoxFit.fitWidth,
-            opacity: 0.3,
-          ),
-        ),
+            // image: DecorationImage(
+            //   image: AssetImage("images/bg.png"),
+            //   alignment: Alignment.bottomCenter,
+            //   fit: BoxFit.fitWidth,
+            //   opacity: 0.3,
+            // ),
+            ),
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(
