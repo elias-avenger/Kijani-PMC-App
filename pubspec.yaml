@@ -39,6 +39,8 @@ dependencies:
   google_fonts: ^6.2.1
   easy_loading_button: ^0.3.2
   loading_animation_widget: ^1.2.1
+  http: ^1.2.2
+  shared_preferences: ^2.3.2
 
 dev_dependencies:
   flutter_test:
