@@ -1,6 +1,7 @@
 import 'package:easy_loading_button/easy_loading_button.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kijani_pmc_app/controllers/user_controller.dart';
 //import 'package:kijani_app/screens/loading/login_loading.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -197,6 +198,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           LoadingAnimationWidget.fourRotatingDots(
                               color: Colors.white, size: 30),
                       onPressed: () async {
+                        UserController myPMC = UserController(
+                          email: emailFieldController.text.toLowerCase(),
+                          code: codeFieldController.text.trim(),
+                        );
+                        String msg = await myPMC.authenticate();
+                        print("Message: $msg");
+                        if (msg == 'Success') {
+                          Map<String, dynamic> userData =
+                              await myPMC.getUserData();
+                          print("UserData: $userData");
+                        }
                         //checkUser = CheckUser(email: emailFieldController.text);
                         // var internetStatus =
                         //     await kInternetConnection.getAirtableConMessage();
