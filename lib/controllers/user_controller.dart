@@ -29,10 +29,7 @@ class UserController extends GetxController {
     if (data['msg'] == 'Found') {
       final userBranch = Branch.fromJson(data['data']);
 
-      branchData['branch'] = data['data']['branch'];
-      branchData['coordinator'] = data['data']['coordinator'];
-      branchData['parishes'] = data['data']['parishes'];
-
+      branchData = RxMap(data['data']);
       var stored = await myPrefs.storeData(key: "userData", data: data['data']);
       if (stored) {
         return "Success";
@@ -48,10 +45,7 @@ class UserController extends GetxController {
 
   Future<Map<String, dynamic>> getBranchData() async {
     Map<String, dynamic> storedData = await myPrefs.getData(key: 'userData');
-    branchData['branch'] = storedData['branch'];
-    branchData['coordinator'] = storedData['coordinator'];
-    branchData['parishes'] = storedData['parishes'];
-    //userType = "Plantation Coordinator".obs;
+    branchData = RxMap(storedData);
     return storedData;
   }
 }

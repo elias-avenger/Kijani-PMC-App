@@ -11,10 +11,11 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final UserController ctrl = Get.find();
   @override
   Widget build(BuildContext context) {
     // Initialize the controller
-    final UserController userController = Get.put(UserController());
+    //final userController = Get.put(UserController());
 
     return Scaffold(
       appBar: AppBar(title: const Text("User Data Example")),
@@ -22,18 +23,8 @@ class _MainScreenState extends State<MainScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Display user data
-          Obx(() {
-            return Text(
-              "Branch: ${userController.branchData['branch'] ?? 'No branch'}",
-              style: const TextStyle(fontSize: 24),
-            );
-          }),
-          Obx(() {
-            return Text(
-              "PMC: ${userController.branchData['coordinator'] ?? 'No PMC'}",
-              style: const TextStyle(fontSize: 24),
-            );
-          }),
+          Text("Branch: ${ctrl.branchData['branch']}"),
+          Text("PMC: ${ctrl.branchData['coordinator'].split(" | ")[1]}"),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {

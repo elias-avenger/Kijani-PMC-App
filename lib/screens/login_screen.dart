@@ -1,5 +1,6 @@
 import 'package:easy_loading_button/easy_loading_button.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kijani_pmc_app/controllers/user_controller.dart';
 //import 'package:kijani_app/screens/loading/login_loading.dart';
@@ -24,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String errorMessage = '';
   String loadingText = '';
-
+  final myPMC = Get.put(UserController());
   @override
   void initState() {
     super.initState();
@@ -200,7 +201,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           LoadingAnimationWidget.fourRotatingDots(
                               color: Colors.white, size: 30),
                       onPressed: () async {
-                        UserController myPMC = UserController();
                         String msg = await myPMC.authenticate(
                           email: emailFieldController.text.toLowerCase(),
                           code: codeFieldController.text.trim(),
@@ -209,12 +209,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (msg == 'Success') {
                           Map<String, dynamic> userData =
                               await myPMC.getBranchData();
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MainScreen(),
-                            ),
-                          );
+                          Get.to(const MainScreen());
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => const MainScreen(),
+                          //   ),
+                          // );
                           print("UserData: $userData");
                         }
                         //checkUser = CheckUser(email: emailFieldController.text);
