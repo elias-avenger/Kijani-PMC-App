@@ -208,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         print("Message: $msg");
                         if (msg == 'Success') {
                           Map<String, dynamic> userData =
-                              await myPMC.getUserData();
+                              await myPMC.getBranchData();
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

@@ -24,13 +24,13 @@ class _MainScreenState extends State<MainScreen> {
           // Display user data
           Obx(() {
             return Text(
-              "Branch: ${userController.userData ?? 'No branch'}",
+              "Branch: ${userController.branchData['branch'] ?? 'No branch'}",
               style: const TextStyle(fontSize: 24),
             );
           }),
           Obx(() {
             return Text(
-              "PMC: ${userController.userType}",
+              "PMC: ${userController.branchData['coordinator'] ?? 'No PMC'}",
               style: const TextStyle(fontSize: 24),
             );
           }),

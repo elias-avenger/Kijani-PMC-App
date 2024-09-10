@@ -1,26 +1,37 @@
 import 'package:get/get.dart';
-import 'package:kijani_pmc_app/models/user.dart';
+import 'package:kijani_pmc_app/models/branch.dart';
+import 'package:kijani_pmc_app/utilities/http_airtable.dart';
 
 import '../utilities/local_storage.dart';
 
 class UserController extends GetxController {
   // final String email;
   // final String code;
-  User pmc = User();
+  HttpAirtable useAirtable = HttpAirtable();
+
+  String myBase = "app9yul6FMnVUm7L4";
+  String myTable = "Parishes";
+
   LocalStorage myPrefs = LocalStorage();
 
-  var userData = <String, dynamic>{}.obs;
-  var userType = " -- ".obs;
+  var branchData = <String, dynamic>{}.obs;
+  //var userType = " -- ".obs;
   Future<String> authenticate({
     required String email,
     required String code,
   }) async {
-    Map<String, dynamic> data = await pmc.checkUser(email: email, code: code);
+    Map<String, dynamic> data = await useAirtable.checkUser(
+      email: email,
+      code: code,
+      baseId: myBase,
+      table: myTable,
+    );
     if (data['msg'] == 'Found') {
-      userData['branch'] = data['data']['branch'];
-      userData['coordinator'] = data['data']['coordinator'];
-      userData['parishes'] = data['data']['parishes'];
-      userType = "Plantation Coordinator".obs;
+      final userBranch = Branch.fromJson(data['data']);
+
+      branchData['branch'] = data['data']['branch'];
+      branchData['coordinator'] = data['data']['coordinator'];
+      branchData['parishes'] = data['data']['parishes'];
 
       var stored = await myPrefs.storeData(key: "userData", data: data['data']);
       if (stored) {
@@ -35,12 +46,12 @@ class UserController extends GetxController {
     }
   }
 
-  Future<Map<String, dynamic>> getUserData() async {
+  Future<Map<String, dynamic>> getBranchData() async {
     Map<String, dynamic> storedData = await myPrefs.getData(key: 'userData');
-    userData['branch'] = storedData['branch'];
-    userData['coordinator'] = storedData['coordinator'];
-    userData['parishes'] = storedData['parishes'];
-    userType = "Plantation Coordinator".obs;
+    branchData['branch'] = storedData['branch'];
+    branchData['coordinator'] = storedData['coordinator'];
+    branchData['parishes'] = storedData['parishes'];
+    //userType = "Plantation Coordinator".obs;
     return storedData;
   }
 }
