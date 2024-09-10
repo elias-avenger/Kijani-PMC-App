@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:kijani_pmc_app/screens/login_screen.dart';
 
@@ -68,7 +69,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
         debugShowCheckedModeBanner: false,
         home: //isLoading
             //? const LoadingScreen():

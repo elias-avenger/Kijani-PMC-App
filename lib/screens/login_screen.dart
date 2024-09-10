@@ -5,6 +5,8 @@ import 'package:kijani_pmc_app/controllers/user_controller.dart';
 //import 'package:kijani_app/screens/loading/login_loading.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
+import 'main_screen.dart';
+
 //import '../utilities/constants.dart';
 
 //import 'airtable_connect.dart';
@@ -198,15 +200,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           LoadingAnimationWidget.fourRotatingDots(
                               color: Colors.white, size: 30),
                       onPressed: () async {
-                        UserController myPMC = UserController(
+                        UserController myPMC = UserController();
+                        String msg = await myPMC.authenticate(
                           email: emailFieldController.text.toLowerCase(),
                           code: codeFieldController.text.trim(),
                         );
-                        String msg = await myPMC.authenticate();
                         print("Message: $msg");
                         if (msg == 'Success') {
                           Map<String, dynamic> userData =
                               await myPMC.getUserData();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MainScreen(),
+                            ),
+                          );
                           print("UserData: $userData");
                         }
                         //checkUser = CheckUser(email: emailFieldController.text);

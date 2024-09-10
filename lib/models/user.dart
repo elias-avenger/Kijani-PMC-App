@@ -1,7 +1,3 @@
-import 'dart:convert';
-
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../utilities/http_airtable.dart';
 import '../utilities/keys.dart';
 
@@ -33,19 +29,5 @@ class User {
       }
       return {"msg": "Found", "data": userData ?? {}};
     }
-  }
-
-  Future storeData({required data}) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var stored = await prefs.setString('userData', jsonEncode(data));
-    return stored;
-  }
-
-  Future<Map<String, dynamic>> getUserData() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    var userDateString = prefs.getString('userData');
-    Map<String, dynamic> data =
-        userDateString != null ? Map.from(jsonDecode(userDateString)) : {};
-    return data;
   }
 }
