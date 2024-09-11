@@ -27,7 +27,7 @@ class UserController extends GetxController {
       table: myTable,
     );
     if (data['msg'] == 'Found') {
-      final userBranch = Branch.fromJson(data['data']);
+      final userBranch = Branch.getData(data['data']);
 
       branchData = RxMap(data['data']);
       var stored = await myPrefs.storeData(key: "userData", data: data['data']);

@@ -7,14 +7,14 @@ class Branch {
     required this.branch,
     required this.parishes,
   });
-  factory Branch.fromJson(Map<String, dynamic> data) {
+  factory Branch.getData(Map<String, dynamic> data) {
     return Branch(
       coordinator: data['coordinator'],
       branch: data['branch'],
       parishes: data['parishes'],
     );
   }
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> setData() {
     return {
       'coordinator': coordinator,
       'branch': branch,
