@@ -1,7 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:kijani_pmc_app/controllers/user_controller.dart';
 import 'package:kijani_pmc_app/screens/login_screen.dart';
+import 'package:kijani_pmc_app/screens/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +24,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Map<String, dynamic> data = {};
   bool isLoading = true;
-
+  final myPMC = Get.put(UserController());
   @override
   void initState() {
     super.initState();
@@ -29,11 +32,23 @@ class _MyAppState extends State<MyApp> {
     getData();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: //isLoading
+            //? const LoadingScreen():
+            data.isEmpty
+                ? const LoginScreen()
+                : const MainScreen() //UserPage(userData: data),
+        );
+  }
+
   Future<void> getData() async {
     setState(() {
       isLoading = true;
     });
-    //data = await kActions.updateUserData();
+    data = await myPMC.getBranchData();
     setState(() {
       isLoading = false;
     });
@@ -64,31 +79,5 @@ class _MyAppState extends State<MyApp> {
         print(e.toString());
       }
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: //isLoading
-            //? const LoadingScreen():
-            data.isEmpty
-                ? const LoginScreen()
-                : const MainScreen() //UserPage(userData: data),
-        );
-  }
-}
-
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
-
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }

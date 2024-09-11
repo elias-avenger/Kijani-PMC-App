@@ -1,14 +1,36 @@
-import 'package:kijani_pmc_app/models/user.dart';
+import 'package:get/get.dart';
+import 'package:kijani_pmc_app/models/branch.dart';
+import 'package:kijani_pmc_app/utilities/http_airtable.dart';
 
-class UserController {
-  final String email;
-  final String code;
-  User pmc = User();
-  UserController({required this.email, required this.code});
-  Future<String> authenticate() async {
-    Map<String, dynamic> data = await pmc.checkUser(email: email, code: code);
+import '../utilities/local_storage.dart';
+
+class UserController extends GetxController {
+  // final String email;
+  // final String code;
+  HttpAirtable useAirtable = HttpAirtable();
+
+  String myBase = "app9yul6FMnVUm7L4";
+  String myTable = "Parishes";
+
+  LocalStorage myPrefs = LocalStorage();
+
+  var branchData = <String, dynamic>{}.obs;
+  //var userType = " -- ".obs;
+  Future<String> authenticate({
+    required String email,
+    required String code,
+  }) async {
+    Map<String, dynamic> data = await useAirtable.checkUser(
+      email: email,
+      code: code,
+      baseId: myBase,
+      table: myTable,
+    );
     if (data['msg'] == 'Found') {
-      var stored = await pmc.storeData(data: data['data']);
+      final userBranch = Branch.getData(data['data']);
+
+      branchData = RxMap(data['data']);
+      var stored = await myPrefs.storeData(key: "userData", data: data['data']);
       if (stored) {
         return "Success";
       } else {
@@ -21,7 +43,13 @@ class UserController {
     }
   }
 
-  Future<Map<String, dynamic>> getUserData() async {
-    return await pmc.getUserData();
+  Future<Map<String, dynamic>> getBranchData() async {
+    Map<String, dynamic> storedData = await myPrefs.getData(key: 'userData');
+    branchData = RxMap(storedData);
+    return storedData;
+  }
+
+  Future<bool> logout() {
+    return myPrefs.removeEverything();
   }
 }
