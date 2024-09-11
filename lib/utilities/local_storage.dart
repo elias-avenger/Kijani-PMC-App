@@ -19,4 +19,9 @@ class LocalStorage {
         userDateString != null ? Map.from(jsonDecode(userDateString)) : {};
     return data;
   }
+
+  Future<bool> removeEverything() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.clear();
+  }
 }

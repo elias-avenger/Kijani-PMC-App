@@ -48,4 +48,8 @@ class UserController extends GetxController {
     branchData = RxMap(storedData);
     return storedData;
   }
+
+  Future<bool> logout() {
+    return myPrefs.removeEverything();
+  }
 }

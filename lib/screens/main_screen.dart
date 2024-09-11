@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kijani_pmc_app/screens/login_screen.dart';
 
 import '../controllers/user_controller.dart';
 
@@ -18,7 +19,22 @@ class _MainScreenState extends State<MainScreen> {
     //final userController = Get.put(UserController());
 
     return Scaffold(
-      appBar: AppBar(title: const Text("User Data Example")),
+      appBar: AppBar(
+        title: const Text("User Data Example"),
+        actions: [
+          ElevatedButton(
+            onPressed: () async {
+              if (await ctrl.logout()) {
+                Get.to(const LoginScreen());
+              }
+            },
+            child: Text(
+              "Logout",
+              style: TextStyle(color: Colors.orange[900]),
+            ),
+          ),
+        ],
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
