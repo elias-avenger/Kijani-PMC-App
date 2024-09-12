@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 
 import 'keys.dart';
 
@@ -137,7 +136,7 @@ class HttpAirtable {
     );
 
     try {
-      final response = await get(
+      final response = await http.get(
         url,
         headers: {
           'Authorization': 'Bearer $apiKey',
