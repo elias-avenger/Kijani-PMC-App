@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kijani_pmc_app/screens/login_screen.dart';
+import 'package:kijani_pmc_app/screens/parish_screen.dart';
 
 import '../controllers/user_controller.dart';
 
@@ -12,7 +13,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  final UserController ctrl = Get.find();
+  final UserController pmcCtrl = Get.find();
   @override
   Widget build(BuildContext context) {
     // Initialize the controller
@@ -26,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         backgroundColor: const Color(0xff23566d),
         title: Text(
-          "${ctrl.branchData['branch']}",
+          "${pmcCtrl.branchData['branch']}",
           style: const TextStyle(color: Colors.white),
         ),
         actions: [
@@ -34,7 +35,7 @@ class _MainScreenState extends State<MainScreen> {
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               onPressed: () async {
-                if (await ctrl.logout()) {
+                if (await pmcCtrl.logout()) {
                   Get.to(const LoginScreen());
                 }
               },
@@ -53,11 +54,11 @@ class _MainScreenState extends State<MainScreen> {
             child: Column(
               children: [
                 Text(
-                  "PMC: ${ctrl.branchData['coordinator'].split(" | ")[1]}",
+                  "PMC: ${pmcCtrl.branchData['coordinator'].split(" | ")[1]}",
                   style: const TextStyle(fontSize: 24),
                 ),
                 const SizedBox(height: 20),
-                for (String parish in ctrl.branchData['parishes'])
+                for (String parish in pmcCtrl.branchData['parishes'])
                   Column(
                     children: [
                       ElevatedButton(
@@ -70,7 +71,9 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                           minimumSize: WidgetStatePropertyAll(Size(300, 60)),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(ParishScreen(parish: parish));
+                        },
                         child: Text(
                           "${parish.split(' | ').last} Parish",
                           style: const TextStyle(
