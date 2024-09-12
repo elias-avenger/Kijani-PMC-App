@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textStyle: const TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.w900,
-                            color: Color.fromARGB(255, 27, 94, 32),
+                            color: Color(0xff23566d),
                           ),
                         ),
                       ),
@@ -92,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textStyle: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
-                            color: Color.fromARGB(255, 27, 94, 32),
+                            color: Color(0xff23566d),
                           ),
                         ),
                       ),
@@ -116,14 +116,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Color.fromARGB(255, 27, 94, 32),
+                              color: Color(0xff23566d),
                             ),
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           border: OutlineInputBorder(),
                           counterText: '',
                           hintStyle: TextStyle(
-                            color: Color.fromARGB(255, 27, 94, 32),
+                            color: Color(0xff23566d),
                             fontSize: 16.0,
                           ),
                         ),
@@ -155,14 +155,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Color.fromARGB(255, 27, 94, 32),
+                              color: Color(0xff23566d),
                             ),
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           border: OutlineInputBorder(),
                           counterText: '',
                           hintStyle: TextStyle(
-                            color: Color.fromARGB(255, 27, 94, 32),
+                            color: Color(0xff23566d),
                             fontSize: 16.0,
                           ),
                         ),
@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     EasyButton(
                       height: 65,
                       borderRadius: 16.0,
-                      buttonColor: const Color(0xFF1c5d27),
+                      buttonColor: const Color(0xff23566d),
                       idleStateWidget: const Text(
                         'Continue',
                         style: TextStyle(
@@ -268,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: GoogleFonts.lato(
                           textStyle: const TextStyle(
                             fontSize: 10,
-                            color: Color.fromARGB(255, 22, 78, 26),
+                            color: Color(0xff23566d),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
