@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_exif_plugin/flutter_exif_plugin.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kijani_pmc_app/components/dialogs/location_service.dart';
-import 'package:kijani_pmc_app/utils/location.dart';
+import 'package:kijani_pmc_app/utilities/location.dart';
 
 class ImagePickerBrain {
   ImagePicker imagePicker = ImagePicker();

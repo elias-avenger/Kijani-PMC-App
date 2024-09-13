@@ -1,9 +1,12 @@
 import 'package:easy_loading_button/easy_loading_button.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kijani_pmc_app/controllers/user_controller.dart';
 //import 'package:kijani_app/screens/loading/login_loading.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+import 'main_screen.dart';
 
 //import '../utilities/constants.dart';
 
@@ -22,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String errorMessage = '';
   String loadingText = '';
-
+  final myPMC = Get.put(UserController());
   @override
   void initState() {
     super.initState();
@@ -72,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textStyle: const TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.w900,
-                            color: Color.fromARGB(255, 27, 94, 32),
+                            color: Color(0xff23566d),
                           ),
                         ),
                       ),
@@ -89,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           textStyle: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w500,
-                            color: Color.fromARGB(255, 27, 94, 32),
+                            color: Color(0xff23566d),
                           ),
                         ),
                       ),
@@ -107,20 +110,20 @@ class _LoginScreenState extends State<LoginScreen> {
                           filled: true,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Colors.green,
+                              color: Color(0xff23566d),
                             ),
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Color.fromARGB(255, 27, 94, 32),
+                              color: Color(0xff23566d),
                             ),
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           border: OutlineInputBorder(),
                           counterText: '',
                           hintStyle: TextStyle(
-                            color: Color.fromARGB(255, 27, 94, 32),
+                            color: Color(0xff23566d),
                             fontSize: 16.0,
                           ),
                         ),
@@ -146,20 +149,20 @@ class _LoginScreenState extends State<LoginScreen> {
                           filled: true,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Colors.green,
+                              color: Color(0xff23566d),
                             ),
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Color.fromARGB(255, 27, 94, 32),
+                              color: Color(0xff23566d),
                             ),
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           border: OutlineInputBorder(),
                           counterText: '',
                           hintStyle: TextStyle(
-                            color: Color.fromARGB(255, 27, 94, 32),
+                            color: Color(0xff23566d),
                             fontSize: 16.0,
                           ),
                         ),
@@ -186,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     EasyButton(
                       height: 65,
                       borderRadius: 16.0,
-                      buttonColor: const Color(0xFF1c5d27),
+                      buttonColor: const Color(0xff23566d),
                       idleStateWidget: const Text(
                         'Continue',
                         style: TextStyle(
@@ -198,15 +201,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           LoadingAnimationWidget.fourRotatingDots(
                               color: Colors.white, size: 30),
                       onPressed: () async {
-                        UserController myPMC = UserController(
+                        String msg = await myPMC.authenticate(
                           email: emailFieldController.text.toLowerCase(),
                           code: codeFieldController.text.trim(),
                         );
-                        String msg = await myPMC.authenticate();
                         print("Message: $msg");
                         if (msg == 'Success') {
                           Map<String, dynamic> userData =
-                              await myPMC.getUserData();
+                              await myPMC.getBranchData();
+                          Get.to(const MainScreen());
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => const MainScreen(),
+                          //   ),
+                          // );
                           print("UserData: $userData");
                         }
                         //checkUser = CheckUser(email: emailFieldController.text);
@@ -259,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: GoogleFonts.lato(
                           textStyle: const TextStyle(
                             fontSize: 10,
-                            color: Color.fromARGB(255, 22, 78, 26),
+                            color: Color(0xff23566d),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
