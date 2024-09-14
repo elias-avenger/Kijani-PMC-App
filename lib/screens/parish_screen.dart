@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kijani_pmc_app/screens/group/register_group.dart';
 
 import '../controllers/user_controller.dart';
 
@@ -82,7 +83,11 @@ class _ParishScreenState extends State<ParishScreen> {
                     minimumSize: const WidgetStatePropertyAll(Size(200, 50)),
                     maximumSize: const WidgetStatePropertyAll(Size(200, 50)),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.to(NewGroupForm(
+                      parishName: widget.parish,
+                    ));
+                  },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
