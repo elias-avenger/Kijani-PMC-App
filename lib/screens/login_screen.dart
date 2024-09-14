@@ -58,12 +58,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(
+                    const SizedBox(
                       height: 180,
                       width: double.infinity,
                       child: Image(
-                        image: const AssetImage("images/kijani_logo.png"),
-                        color: Colors.green[900],
+                        image: AssetImage("images/kijani_logo.png"),
+                        color: Color(0xff23566d),
                       ),
                     ),
                     SizedBox(

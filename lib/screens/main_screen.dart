@@ -21,9 +21,13 @@ class _MainScreenState extends State<MainScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.asset('images/kijani_logo.png'),
+          child: Image.asset(
+            'images/kijani_logo.png',
+            color: Colors.white,
+          ),
         ),
         backgroundColor: const Color(0xff23566d),
         title: Text(
@@ -31,20 +35,51 @@ class _MainScreenState extends State<MainScreen> {
           style: const TextStyle(color: Colors.white),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () async {
+          PopupMenuButton<String>(
+            onSelected: (String value) async {
+              if (value == 'logout') {
                 if (await pmcCtrl.logout()) {
                   Get.to(const LoginScreen());
                 }
-              },
-              child: Text(
-                "Logout",
-                style: TextStyle(color: Colors.orange[900], fontSize: 16),
-              ),
-            ),
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.logout,
+                        color: Colors.red,
+                      ),
+                      SizedBox(width: 16),
+                      Text(
+                        'Logout',
+                        style: TextStyle(
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ];
+            },
           ),
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: ElevatedButton(
+          //     onPressed: () async {
+          //       if (await pmcCtrl.logout()) {
+          //         Get.to(const LoginScreen());
+          //       }
+          //     },
+          //     child: Text(
+          //       "Logout",
+          //       style: TextStyle(color: Colors.orange[900], fontSize: 16),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
       body: SingleChildScrollView(
