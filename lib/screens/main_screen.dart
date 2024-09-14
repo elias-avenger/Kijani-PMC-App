@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kijani_pmc_app/screens/login_screen.dart';
 import 'package:kijani_pmc_app/screens/parish_screen.dart';
+import 'package:kijani_pmc_app/utilities/greetings.dart';
 
 import '../controllers/user_controller.dart';
 
@@ -30,10 +31,6 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
         backgroundColor: const Color(0xff23566d),
-        title: Text(
-          "${pmcCtrl.branchData['branch']}",
-          style: const TextStyle(color: Colors.white),
-        ),
         actions: [
           PopupMenuButton<String>(
             onSelected: (String value) async {
@@ -66,82 +63,98 @@ class _MainScreenState extends State<MainScreen> {
               ];
             },
           ),
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: ElevatedButton(
-          //     onPressed: () async {
-          //       if (await pmcCtrl.logout()) {
-          //         Get.to(const LoginScreen());
-          //       }
-          //     },
-          //     child: Text(
-          //       "Logout",
-          //       style: TextStyle(color: Colors.orange[900], fontSize: 16),
-          //     ),
-          //   ),
-          // ),
         ],
       ),
       body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Text(
-                  "PMC: ${pmcCtrl.branchData['coordinator'].split(" | ")[1]}",
-                  style: const TextStyle(fontSize: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                Greetings().getGreeting(),
+                style: const TextStyle(fontSize: 20),
+              ),
+              Text(
+                "${pmcCtrl.branchData['coordinator'].split(" | ")[1]}",
+                style: const TextStyle(
+                  color: Color(0xff23566d),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 20),
-                for (String parish in pmcCtrl.branchData['parishes'])
-                  Column(
-                    children: [
-                      ElevatedButton(
-                        style: const ButtonStyle(
-                          backgroundColor:
-                              WidgetStatePropertyAll(Color(0xff23566d)),
-                          shape: WidgetStatePropertyAll(
-                            RoundedRectangleBorder(
-                                borderRadius: BorderRadius.zero),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "${pmcCtrl.branchData['branch']}",
+                style: const TextStyle(
+                  color: Color(0xff23566d),
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'You have ${pmcCtrl.branchData['parishes'].length} assigned parishes',
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 4),
+              for (String parish in pmcCtrl.branchData['parishes'])
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            const WidgetStatePropertyAll(Color(0xff23566d)),
+                        shape: WidgetStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          minimumSize: WidgetStatePropertyAll(Size(300, 60)),
                         ),
-                        onPressed: () {
-                          Get.to(ParishScreen(parish: parish));
-                        },
-                        child: Text(
-                          "${parish.split(' | ').last} Parish",
-                          style: const TextStyle(
-                              fontSize: 18, color: Colors.white),
-                        ),
+                        minimumSize:
+                            const WidgetStatePropertyAll(Size(300, 60)),
                       ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                    ],
-                  ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(Colors.grey[400]),
-                    minimumSize: const WidgetStatePropertyAll(Size(200, 50)),
-                    maximumSize: const WidgetStatePropertyAll(Size(200, 50)),
-                  ),
-                  onPressed: () {},
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add, size: 24, color: Color(0xff23566d)),
-                      Text(
-                        'Add parish',
+                      onPressed: () {
+                        Get.to(ParishScreen(parish: parish));
+                      },
+                      child: Text(
+                        "${parish.split(' | ').last} Parish",
                         style:
-                            TextStyle(color: Color(0xff23566d), fontSize: 16),
+                            const TextStyle(fontSize: 18, color: Colors.white),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                style: ButtonStyle(
+                  shape: WidgetStatePropertyAll(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  backgroundColor: WidgetStatePropertyAll(Colors.grey[400]),
+                  minimumSize: const WidgetStatePropertyAll(Size(200, 50)),
+                  maximumSize: const WidgetStatePropertyAll(Size(200, 50)),
+                ),
+                onPressed: () {},
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add, size: 24, color: Color(0xff23566d)),
+                    Text(
+                      'Add parish',
+                      style: TextStyle(color: Color(0xff23566d), fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
