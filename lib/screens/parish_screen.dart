@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kijani_pmc_app/screens/group/dashbaord.dart';
 import 'package:kijani_pmc_app/screens/group/register_group.dart';
 
 import '../controllers/user_controller.dart';
@@ -55,7 +56,9 @@ class _ParishScreenState extends State<ParishScreen> {
                           maximumSize:
                               const WidgetStatePropertyAll(Size(300, 60)),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(() => const GroupDashBoard());
+                        },
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
