@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:kijani_pmc_app/models/branch.dart';
-import 'package:kijani_pmc_app/utilities/http_airtable.dart';
+import 'package:kijani_pmc_app/services/http_airtable.dart';
 
-import '../utilities/local_storage.dart';
+import '../services/local_storage.dart';
 
 class UserController extends GetxController {
   // final String email;
@@ -20,7 +20,7 @@ class UserController extends GetxController {
     required String email,
     required String code,
   }) async {
-    Map<String, dynamic> data = await useAirtable.checkUser(
+    Map<String, dynamic> data = await checkUser(
       email: email,
       code: code,
       baseId: myBase,
@@ -40,6 +40,39 @@ class UserController extends GetxController {
       return data['msg'];
     } else {
       return "Failure";
+    }
+  }
+
+  Future<Map<String, dynamic>> checkUser({
+    required String email,
+    required String code,
+    required String baseId,
+    required String table,
+  }) async {
+    //String view = 'To MEL App';
+    String filter = 'AND({PMC Email}="$email", {Branch-code}="$code")';
+    // HttpAirtable airtable = HttpAirtable(
+    //     apiKey: airtableAccessToken, baseId: myBase, tableName: myTable);
+    Map data = await useAirtable.fetchDataWithFilter(
+      filter: filter,
+      baseId: baseId,
+      table: table,
+    );
+    Map<String, dynamic>? userData;
+    List parishes = [];
+    if (data['records'].isEmpty) {
+      return {"msg": "Not Found"};
+    } else {
+      for (var record in data['records']) {
+        //print("Record Fields: ${record['fields']['ID']}");
+        parishes.add(record['fields']['ID']);
+        userData = {
+          'branch': record['fields']['Branch'],
+          'coordinator': record['fields']['PMC'],
+          'parishes': parishes,
+        };
+      }
+      return {"msg": "Found", "data": userData ?? {}};
     }
   }
 

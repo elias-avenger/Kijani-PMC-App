@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
-  Future storeData({
+  Future<bool> storeData({
     required String key,
     required Map<String, dynamic> data,
   }) async {
