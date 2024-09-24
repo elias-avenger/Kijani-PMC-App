@@ -10,3 +10,4 @@ ButtonStyle kGreenButtonStyle = ButtonStyle(
 );
 Color kijaniBlue = Color(0xff23566d);
 Color kijaniGreen = Color(0xff265e3c);
+Color kijaniBrown = Color(0xff7c3d1c);

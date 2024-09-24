@@ -298,33 +298,22 @@ class _ReportScreenState extends State<ReportScreen> {
                     ),
                     const SizedBox(height: 10),
                     // Display TextFormFields for selected farmer challenges
-                    for (String challenge in controller.farmerChallenges.keys)
-                      if (controller.farmerChallenges[challenge]! == true)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              hintText: "Details for $challenge",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: const BorderSide(
-                                  color: Color(0xff23566d),
-                                  width: 2.0,
+                    if (controller.farmerChallenges.containsValue(true))
+                      Wrap(
+                        children: [
+                          Text('Selected challenges'),
+                          for (String challenge
+                              in controller.farmerChallenges.keys)
+                            if (controller.farmerChallenges[challenge]! == true)
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                child: Text(
+                                  "✅ $challenge",
                                 ),
                               ),
-                            ),
-                            onChanged: (value) {
-                              controller.updateItemDetails(
-                                  'farmerChallenges', challenge, value);
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter details for $challenge';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
+                        ],
+                      ),
+
                     // Button to select individual challenges
                     const SizedBox(height: 10),
                     ElevatedButton(
@@ -381,35 +370,22 @@ class _ReportScreenState extends State<ReportScreen> {
                       child: const Text('Select Individual Challenges'),
                     ),
                     const SizedBox(height: 10),
-                    // Display TextFormFields for selected individual challenges
-                    for (String challenge
-                        in controller.individualChallenges.keys)
-                      if (controller.individualChallenges[challenge]! == true)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              hintText: "Details for $challenge",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                                borderSide: const BorderSide(
-                                  color: Color(0xff23566d),
-                                  width: 2.0,
+                    if (controller.farmerChallenges.containsValue(true))
+                      Wrap(
+                        children: [
+                          Text('selected challenges'),
+                          for (String challenge
+                              in controller.individualChallenges.keys)
+                            if (controller.individualChallenges[challenge]! ==
+                                true)
+                              Container(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "✅ $challenge",
                                 ),
                               ),
-                            ),
-                            onChanged: (value) {
-                              controller.updateItemDetails(
-                                  'individualChallenges', challenge, value);
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter details for $challenge';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
+                        ],
+                      ),
                     const SizedBox(height: 20),
                     // Submit Button
                     ElevatedButton(
