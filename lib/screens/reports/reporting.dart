@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -194,17 +196,34 @@ class _ReportScreenState extends State<ReportScreen> {
                               child: Column(
                                 children: [
                                   Text(
-                                    "photo of $challenge",
+                                    "Photo of $challenge",
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 16,
                                     ),
                                   ),
-                                  const Icon(
-                                    Icons.camera_alt,
-                                    size: 50,
-                                    color: Colors.grey,
-                                  ),
+                                  const SizedBox(height: 8),
+
+                                  // Check if there's an image path for this challenge
+                                  Obx(() {
+                                    final imagePath = controller
+                                        .gardenChallengeDetails[challenge];
+                                    if (imagePath != null &&
+                                        imagePath.isNotEmpty) {
+                                      // Display the selected image
+                                      return Image.file(
+                                        File(imagePath),
+                                        fit: BoxFit.cover,
+                                      );
+                                    } else {
+                                      // Display the camera icon if no image is selected
+                                      return const Icon(
+                                        Icons.camera_alt,
+                                        size: 50,
+                                        color: Colors.grey,
+                                      );
+                                    }
+                                  }),
                                 ],
                               ),
                             ),
@@ -221,6 +240,7 @@ class _ReportScreenState extends State<ReportScreen> {
                             }
                           },
                         ),
+
                     // Button to select farmer challenges
                     const SizedBox(height: 10),
                     ElevatedButton(
