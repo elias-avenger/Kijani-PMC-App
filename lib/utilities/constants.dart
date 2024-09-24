@@ -8,3 +8,5 @@ ButtonStyle kGreenButtonStyle = ButtonStyle(
   shape: WidgetStateProperty.all<RoundedRectangleBorder>(
       RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0))),
 );
+Color kijaniBlue = Color(0xff23566d);
+Color kijaniGreen = Color(0xff265e3c);
