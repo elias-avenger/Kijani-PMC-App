@@ -71,6 +71,12 @@ class ReportsController extends GetxController {
     return myPrefs.storeData(key: 'failedReports', data: storedReports);
   }
 
+  Future<int> countUnSyncedReports() async {
+    Map<String, dynamic> reportsData =
+        await myPrefs.getData(key: 'failedReports');
+    return reportsData.length;
+  }
+
   void uploadUnSyncedReports() async {
     //TODO: implement uploading of unSynced data
     //fetch local data
