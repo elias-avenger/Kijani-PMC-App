@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kijani_pmc_app/screens/login_screen.dart';
 import 'package:kijani_pmc_app/screens/parish_screen.dart';
+import 'package:kijani_pmc_app/screens/reports/reporting.dart';
+import 'package:kijani_pmc_app/utilities/constants.dart';
 import 'package:kijani_pmc_app/utilities/greetings.dart';
 
 import '../controllers/user_controller.dart';
@@ -117,7 +119,14 @@ class _MainScreenState extends State<MainScreen> {
                             const WidgetStatePropertyAll(Size(300, 60)),
                       ),
                       onPressed: () {
-                        Get.to(ParishScreen(parish: parish));
+                        //TODO: Navigate to parish screen
+                        //Get.to(ParishScreen(parish: parish));
+                        Get.snackbar(
+                          'Coming Soon',
+                          'This feature is coming soon',
+                          backgroundColor: Colors.orange,
+                          colorText: Colors.white,
+                        );
                       },
                       child: Text(
                         "${parish.split(' | ').last} Parish",
@@ -142,13 +151,17 @@ class _MainScreenState extends State<MainScreen> {
                   minimumSize: const WidgetStatePropertyAll(Size(200, 50)),
                   maximumSize: const WidgetStatePropertyAll(Size(200, 50)),
                 ),
-                onPressed: () {},
-                child: const Row(
+                onPressed: () {
+                  //TODO: open repoting form
+
+                  Get.to(const ReportScreen());
+                },
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.add, size: 24, color: Color(0xff23566d)),
-                    Text(
-                      'Add parish',
+                    Icon(Icons.add, size: 24, color: kijaniBlue),
+                    const Text(
+                      'Submit Report',
                       style: TextStyle(color: Color(0xff23566d), fontSize: 16),
                     ),
                   ],
