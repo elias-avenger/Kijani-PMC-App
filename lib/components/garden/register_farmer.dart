@@ -168,7 +168,7 @@ class _RegisterFarmerFormState extends State<RegisterFarmerForm> {
                     children: [
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        style: kGreenButtonStyle,
+                        style: kBlackButtonStyle,
                         onPressed: () async {
                           // //select image from either gallery or camera
                           // final selectedImage =
