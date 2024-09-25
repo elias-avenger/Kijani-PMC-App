@@ -42,20 +42,32 @@ class ReportController extends GetxController {
         false,
   }.obs;
 
-  var individualChallenges = {
-    'Large working area to be covered by only one PMC.': false,
-    'Delay on the provision of field facilitation like fuel delays daily activity.':
-        false,
-    'Insecurity.': false,
-    'Wild animals attack.': false,
-    'House rent is more expensive than the one given by the company.': false,
-  }.obs;
+  // Individual challenges as a list
+  var individualChallenges = [
+    'Large working area to be covered by only one PMC.',
+    'Delay on the provision of field facilitation like fuel delays daily activity.',
+    'Insecurity.',
+    'Wild animals attack.',
+    'House rent is more expensive than the one given by the company.'
+  ].obs;
+
+  // State tracking map for individual challenges
+  var selectedIndividualChallenges = <String, bool>{}.obs;
 
   // Maps to store details for each category when selected
   var activityDetails = <String, String>{}.obs;
-  var gardenChallengeDetails = <String, String>{}.obs;
+  var gardenChallengeDetails = <String, dynamic>{}.obs;
   var farmerChallengeDetails = <String, String>{}.obs;
   var individualChallengeDetails = <String, String>{}.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Initialize the state of each individual challenge as unselected
+    for (var challenge in individualChallenges) {
+      selectedIndividualChallenges[challenge] = false;
+    }
+  }
 
   // General method to toggle the item state in any category
   void toggleItem(String category, String item, bool value) {
@@ -71,8 +83,8 @@ class ReportController extends GetxController {
   }
 
   // General method to update details for a selected item in any category
-  void updateItemDetails(String category, String item, String details) {
-    RxMap<String, String>? detailsMap = _getDetailsMapByCategory(category);
+  void updateItemDetails(String category, String item, dynamic details) {
+    RxMap<String, dynamic>? detailsMap = _getDetailsMapByCategory(category);
     if (detailsMap != null) {
       detailsMap[item] = details;
     }
@@ -81,14 +93,14 @@ class ReportController extends GetxController {
   // General method to get a list of selected items with their details for a category
   List<Map<String, String>> getSelectedItemsWithDetails(String category) {
     RxMap<String, bool>? map = _getMapByCategory(category);
-    RxMap<String, String>? detailsMap = _getDetailsMapByCategory(category);
+    RxMap<String, dynamic>? detailsMap = _getDetailsMapByCategory(category);
     if (map == null || detailsMap == null) return [];
 
     return map.entries
         .where((entry) => entry.value)
         .map((entry) => {
               'item': entry.key,
-              'details': detailsMap[entry.key] ?? '',
+              'details': detailsMap[entry.key]?.toString() ?? '',
             })
         .toList();
   }
@@ -103,14 +115,14 @@ class ReportController extends GetxController {
       case 'farmerChallenges':
         return farmerChallenges;
       case 'individualChallenges':
-        return individualChallenges;
+        return selectedIndividualChallenges;
       default:
         return null;
     }
   }
 
   // Helper method to get the details map by category name
-  RxMap<String, String>? _getDetailsMapByCategory(String category) {
+  RxMap<String, dynamic>? _getDetailsMapByCategory(String category) {
     switch (category) {
       case 'activities':
         return activityDetails;

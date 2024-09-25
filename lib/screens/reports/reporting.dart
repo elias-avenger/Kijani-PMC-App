@@ -1,9 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:kijani_pmc_app/controllers/report_controller.dart';
+import 'package:kijani_pmc_app/controllers/UI%20controllers/report_controller.dart';
 import 'package:kijani_pmc_app/utilities/constants.dart';
 import 'package:kijani_pmc_app/utilities/image_picker.dart';
 
@@ -15,12 +14,11 @@ class ReportScreen extends StatefulWidget {
 }
 
 class _ReportScreenState extends State<ReportScreen> {
-  //form key
   static final _formKey = GlobalKey<FormState>();
+  TextEditingController descController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    // Initialize the controller
     final ReportController controller = Get.put(ReportController());
 
     return Scaffold(
@@ -123,6 +121,7 @@ class _ReportScreenState extends State<ReportScreen> {
                           ),
                         ),
                     const SizedBox(height: 10),
+
                     // Button to select garden challenges
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -212,7 +211,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                         imagePath.isNotEmpty) {
                                       // Display the selected image
                                       return Image.file(
-                                        File(imagePath),
+                                        File(imagePath['photoPath']),
                                         fit: BoxFit.cover,
                                       );
                                     } else {
@@ -235,14 +234,14 @@ class _ReportScreenState extends State<ReportScreen> {
                               controller.updateItemDetails(
                                 'gardenChallenges',
                                 challenge,
-                                image.path,
+                                {'photoPath': image.path, 'name': image.name},
                               );
                             }
                           },
                         ),
 
-                    // Button to select farmer challenges
                     const SizedBox(height: 10),
+                    // Button to select farmer challenges
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff23566d),
@@ -298,24 +297,44 @@ class _ReportScreenState extends State<ReportScreen> {
                     ),
                     const SizedBox(height: 10),
                     // Display TextFormFields for selected farmer challenges
-                    if (controller.farmerChallenges.containsValue(true))
-                      Wrap(
-                        children: [
-                          Text('Selected challenges'),
-                          for (String challenge
-                              in controller.farmerChallenges.keys)
-                            if (controller.farmerChallenges[challenge]! == true)
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                child: Text(
-                                  "✅ $challenge",
+
+                    for (String challenge in controller.farmerChallenges.keys)
+                      if (controller.farmerChallenges[challenge]! == true)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Column(
+                            children: [
+                              Text(challenge),
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: "Enter numbers",
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderSide: const BorderSide(
+                                      color: Color(0xff23566d),
+                                      width: 2.0,
+                                    ),
+                                  ),
                                 ),
+                                onChanged: (value) {
+                                  controller.updateItemDetails(
+                                      'farmerChallenges', challenge, value);
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a value';
+                                  }
+                                  return null;
+                                },
+                                keyboardType: TextInputType.number,
                               ),
-                        ],
-                      ),
+                            ],
+                          ),
+                        ),
+
+                    const SizedBox(height: 10),
 
                     // Button to select individual challenges
-                    const SizedBox(height: 10),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xff23566d),
@@ -336,8 +355,8 @@ class _ReportScreenState extends State<ReportScreen> {
                                   padding: const EdgeInsets.all(12.0),
                                   child: Column(
                                     children: [
-                                      for (String challenge in controller
-                                          .individualChallenges.keys)
+                                      for (String challenge
+                                          in controller.individualChallenges)
                                         Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -347,7 +366,7 @@ class _ReportScreenState extends State<ReportScreen> {
                                               trailing: Checkbox(
                                                 activeColor: Colors.green,
                                                 value: controller
-                                                        .individualChallenges[
+                                                        .selectedIndividualChallenges[
                                                     challenge],
                                                 onChanged: (value) {
                                                   controller.toggleItem(
@@ -370,13 +389,17 @@ class _ReportScreenState extends State<ReportScreen> {
                       child: const Text('Select Individual Challenges'),
                     ),
                     const SizedBox(height: 10),
-                    if (controller.farmerChallenges.containsValue(true))
+
+                    // Display selected individual challenges
+                    if (controller.selectedIndividualChallenges
+                        .containsValue(true))
                       Wrap(
                         children: [
-                          Text('selected challenges'),
+                          const Text('Selected challenges:'),
                           for (String challenge
-                              in controller.individualChallenges.keys)
-                            if (controller.individualChallenges[challenge]! ==
+                              in controller.individualChallenges)
+                            if (controller
+                                    .selectedIndividualChallenges[challenge]! ==
                                 true)
                               Container(
                                 padding: const EdgeInsets.all(8.0),
@@ -386,6 +409,24 @@ class _ReportScreenState extends State<ReportScreen> {
                               ),
                         ],
                       ),
+
+                    const SizedBox(height: 20),
+                    const Text('Report Description'),
+                    TextFormField(
+                      controller: descController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      maxLines: 5,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter details';
+                        }
+                        return null;
+                      },
+                    ),
                     const SizedBox(height: 20),
                     // Submit Button
                     ElevatedButton(
@@ -395,9 +436,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         padding: const EdgeInsets.all(14),
                       ),
                       onPressed: () {
-                        //validate form
                         if (_formKey.currentState!.validate()) {
-                          // Handle form submission
                           final selectedActivities = controller
                               .getSelectedItemsWithDetails('activities');
                           final selectedGardenChallenges = controller
@@ -407,8 +446,8 @@ class _ReportScreenState extends State<ReportScreen> {
                           final selectedIndividualChallenges =
                               controller.getSelectedItemsWithDetails(
                                   'individualChallenges');
+                          final description = descController.text;
 
-                          // You can now use these lists to process or send data
                           print('Selected Activities: $selectedActivities');
                           print(
                               'Selected Garden Challenges: $selectedGardenChallenges');
@@ -416,12 +455,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               'Selected Farmer Challenges: $selectedFarmerChallenges');
                           print(
                               'Selected Individual Challenges: $selectedIndividualChallenges');
-                          // Show a success message
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Report submitted successfully'),
-                            ),
-                          );
+                          print('description: $description');
                         }
                       },
                       child: const Text('Submit Report'),

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:kijani_pmc_app/screens/login_screen.dart';
 import 'package:kijani_pmc_app/screens/parish_screen.dart';
 import 'package:kijani_pmc_app/screens/reports/reporting.dart';
+import 'package:kijani_pmc_app/utilities/constants.dart';
 import 'package:kijani_pmc_app/utilities/greetings.dart';
 
 import '../controllers/user_controller.dart';
@@ -155,11 +156,11 @@ class _MainScreenState extends State<MainScreen> {
 
                   Get.to(const ReportScreen());
                 },
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.add, size: 24, color: Color(0xff23566d)),
-                    Text(
+                    Icon(Icons.add, size: 24, color: kijaniBlue),
+                    const Text(
                       'Submit Report',
                       style: TextStyle(color: Color(0xff23566d), fontSize: 16),
                     ),
