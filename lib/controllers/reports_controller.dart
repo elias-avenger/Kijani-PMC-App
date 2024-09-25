@@ -11,6 +11,7 @@ class ReportsController extends GetxController {
   LocalStorage myPrefs = LocalStorage();
   AWSService awsAccess = AWSService();
   InternetCheck internetCheck = InternetCheck();
+  var unSyncedReports = 0.obs;
 
   Future<String> submitReport({
     required Map<String, dynamic> reportData,
@@ -71,11 +72,60 @@ class ReportsController extends GetxController {
     return myPrefs.storeData(key: 'failedReports', data: storedReports);
   }
 
+  Future<int> countUnSyncedReports() async {
+    Map<String, dynamic> reportsData =
+        await myPrefs.getData(key: 'failedReports');
+    return reportsData.length;
+  }
+
   void uploadUnSyncedReports() async {
-    //TODO: implement uploading of unSynced data
-    //fetch local data
-    //upload using a loop
-    //delete uploaded data
-    //use Getx to handle unSynced data updates
+    Map<String, dynamic> reportsData =
+        await myPrefs.getData(key: 'failedReports');
+    String awsAccessMsg = await internetCheck.getAWSConMessage();
+    String airtableAccessMsg = await internetCheck.getAirtableConMessage();
+    while (awsAccessMsg == "connected" &&
+        airtableAccessMsg == "connected" &&
+        reportsData.isNotEmpty) {
+      String firstKey = reportsData.keys.first;
+      Map<String, dynamic> targetData = reportsData[firstKey];
+
+      //upload images to aws
+      Map<String, dynamic> photos = targetData['Garden challenges photos'];
+      int numPhotos = photos.length;
+      Map<String, dynamic> uploaded = await awsAccess.uploadPhotosMap(
+          photosData: photos, numPhotos: numPhotos);
+      if (uploaded['msg'] == "success") {
+        //prepare data to submit to airtable
+        Map<String, dynamic> dataToSubmit = targetData;
+
+        //convert uploaded photos urls to a comma separated string
+        Map<String, dynamic> photosUrls = uploaded['data'];
+        String photosString = "";
+        for (String url in photosUrls.keys) {
+          photosString += url == photosUrls.keys.last
+              ? photosUrls[url]
+              : "${photosUrls[url]}, ";
+        }
+        dataToSubmit['Garden challenges photos'] = photosString;
+
+        // submit data
+        Map<String, dynamic> response = await airtableAccess.createRecord(
+          data: dataToSubmit,
+          baseId: 'appoW7X8Lz3bIKpEE',
+          table: 'PMC Reports',
+        );
+        if (response.keys.first == 'success') {
+          await myPrefs.removeUnSyncedData(
+            type: 'failedReports',
+            key: firstKey,
+            data: targetData,
+          );
+        }
+      }
+      reportsData = await myPrefs.getData(key: 'failedReports');
+      awsAccessMsg = await internetCheck.getAWSConMessage();
+      airtableAccessMsg = await internetCheck.getAirtableConMessage();
+    }
+    unSyncedReports = (await countUnSyncedReports()) as RxInt;
   }
 }
