@@ -441,7 +441,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.all(14),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           //initialise a map to hold report data to submit
                           Map<String, dynamic> dataToSubmit = {};
@@ -459,43 +459,37 @@ class _ReportScreenState extends State<ReportScreen> {
                             activitiesToSubmit.add(activity['item']);
                             activity['item'] == 'Weeding'
                                 ? dataToSubmit['Gardens weeded'] =
-                                    activity['details']
+                                    int.parse(activity['details'])
                                 : activity['item'] == 'Pruning'
                                     ? dataToSubmit['Gardens pruned'] =
-                                        activity['details']
+                                        int.parse(activity['details'])
                                     : activity['item'] == 'Thinning'
                                         ? dataToSubmit['Gardens thinned'] =
-                                            activity['details']
+                                            int.parse(activity['details'])
                                         : activity['item'] ==
                                                 'Pest and disease control'
                                             ? dataToSubmit['Gardens pest and disease Controlled'] =
-                                                activity['details']
+                                                int.parse(activity['details'])
                                             : activity['item'] ==
                                                     'Fire line creation'
-                                                ? dataToSubmit['Gardens fire lines created'] =
-                                                    activity['details']
+                                                ? dataToSubmit['Gardens fire lines created'] = int.parse(
+                                                    activity['details'])
                                                 : activity['item'] ==
                                                         'Farmer contract signing'
                                                     ? dataToSubmit['Farmer contracts signed'] =
-                                                        activity['details']
+                                                        int.parse(
+                                                            activity['details'])
                                                     : activity['item'] ==
                                                             'Identifying outstanding farmers'
-                                                        ? dataToSubmit['Outstanding farmers identified'] =
-                                                            activity['details']
+                                                        ? dataToSubmit['Outstanding farmers identified'] = int.parse(
+                                                            activity['details'])
                                                         : activity['item'] ==
                                                                 'Groups mobilization'
                                                             ? dataToSubmit['Groups remobilized'] =
-                                                                activity[
-                                                                    'details']
-                                                            : activity['item'] ==
-                                                                    'Farmers mobilization'
-                                                                ? dataToSubmit[
-                                                                        'Farmers mobilized'] =
-                                                                    activity[
-                                                                        'details']
-                                                                : Get.snackbar(
-                                                                    "Error:",
-                                                                    "Found wrong activity");
+                                                                int.parse(activity['details'])
+                                                            : activity['item'] == 'Farmers mobilization'
+                                                                ? dataToSubmit['Farmers mobilized'] = int.parse(activity['details'])
+                                                                : Get.snackbar("Error:", "Found wrong activity");
                           }
                           dataToSubmit['Activities'] = activitiesToSubmit;
 
@@ -525,7 +519,7 @@ class _ReportScreenState extends State<ReportScreen> {
                               in selectedFarmerChallenges) {
                             farmerChallengesToSubmit.add(challenge['item']);
                             dataToSubmit[challenge['item']] =
-                                challenge['details'];
+                                int.parse(challenge['details']);
                           }
                           dataToSubmit['Farmer challenges'] =
                               farmerChallengesToSubmit;
@@ -549,18 +543,12 @@ class _ReportScreenState extends State<ReportScreen> {
 
                           //add date
                           dataToSubmit['Date'] =
-                              "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}";
+                              "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
 
                           //submit data
-                          print('Data to submit: $dataToSubmit');
-                          //dataController.submitReport(reportData: dataToSubmit);
-                          // print(
-                          //     'Selected Garden Challenges: $selectedGardenChallenges');
-                          // print(
-                          //     "User: ${pmcCtrl.branchData['branch']} | ${pmcCtrl.branchData['coordinator']}");
-                          // print(
-                          //     'Selected Individual Challenges: $selectedIndividualChallenges');
-                          // print('description: $description');
+                          String submitted = await dataController.submitReport(
+                              reportData: dataToSubmit);
+                          print("Response: $submitted");
                         }
                       },
                       child: const Text('Submit Report'),
