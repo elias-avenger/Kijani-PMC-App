@@ -3,20 +3,19 @@ import 'package:get/get.dart';
 class ReportController extends GetxController {
   // Reactive maps for different categories
   var activities = {
-    'Pest and disease control ': false,
-    'garden weeded': false,
-    'Garden pruned': false,
-    'Garden thinned': false,
-    'Contracts signed with farmers': false,
-    'Fireline created': false,
-    'groups remobilized': false,
-    'Outstanding Farmers identified in a parish': false,
-    'Old groups remobilized to work again with us': false,
-    'Old farmers remobilized to continue planting with us': false,
+    'Pest and disease control': false,
+    'Weeding': false,
+    'Pruning': false,
+    'Thinning': false,
+    'Farmer contract signing': false,
+    'Fire line creation': false,
+    'Identifying outstanding farmers': false,
+    'Groups mobilization': false,
+    'Farmers mobilization': false,
   }.obs;
 
   var gardenChallenges = {
-    'Gardens full of weed.': false,
+    'Gardens full of weed': false,
     'Garden not pruned': false,
     'Garden poorly pruned': false,
     'Trees planted at poor spacing': false,
@@ -27,28 +26,26 @@ class ReportController extends GetxController {
     'Fireline not created at all': false,
     'Fireline not properly created': false,
     'Garden not thinned': false,
-    'Garden poorly thinned.': false,
+    'Garden poorly thinned': false,
+    'Farmers cut down trees for their own needs': false,
   }.obs;
 
   var farmerChallenges = {
-    'Some farmers are harshly demanding for the copy of their contract.': false,
-    'Few farmers are refusing to sign the contract yet they planted with us.':
-        false,
-    'Some farmers always demand for money once you seek their support.': false,
-    'Hostility shown by some farmers due to the delay on incentive payment.':
-        false,
-    'Some farmers have been misled by other organizations.': false,
-    'Some farmers are not willing to provide equipment for managing their plantation.':
-        false,
+    'Demanding for a copy of their contract': false,
+    'Refused to sign contract': false,
+    'Farmer demanded for money': false,
+    'Complaints about delay of incentive payment': false,
+    'Misled by other organizations': false,
+    'Farmer not willing to provide equipment': false,
   }.obs;
 
   // Individual challenges as a list
   var individualChallenges = [
-    'Large working area to be covered by only one PMC.',
-    'Delay on the provision of field facilitation like fuel delays daily activity.',
-    'Insecurity.',
-    'Wild animals attack.',
-    'House rent is more expensive than the one given by the company.'
+    'Large working area',
+    'Field facilitation delays',
+    'Insecurity',
+    'Wild animal attacks',
+    'House rent not enough',
   ].obs;
 
   // State tracking map for individual challenges
@@ -71,7 +68,7 @@ class ReportController extends GetxController {
 
   // General method to toggle the item state in any category
   void toggleItem(String category, String item, bool value) {
-    RxMap<String, bool>? map = _getMapByCategory(category);
+    RxMap<String, dynamic>? map = _getMapByCategory(category);
     if (map != null) {
       map[item] = value;
       if (!value) {
@@ -91,8 +88,8 @@ class ReportController extends GetxController {
   }
 
   // General method to get a list of selected items with their details for a category
-  List<Map<String, String>> getSelectedItemsWithDetails(String category) {
-    RxMap<String, bool>? map = _getMapByCategory(category);
+  List<Map<String, dynamic>> getSelectedItemsWithDetails(String category) {
+    RxMap<String, dynamic>? map = _getMapByCategory(category);
     RxMap<String, dynamic>? detailsMap = _getDetailsMapByCategory(category);
     if (map == null || detailsMap == null) return [];
 
@@ -100,13 +97,14 @@ class ReportController extends GetxController {
         .where((entry) => entry.value)
         .map((entry) => {
               'item': entry.key,
-              'details': detailsMap[entry.key]?.toString() ?? '',
+              'details': detailsMap[entry.key]?.toString() ??
+                  '', //TODO: this could be causing problems
             })
         .toList();
   }
 
   // Helper method to get the reactive map by category name
-  RxMap<String, bool>? _getMapByCategory(String category) {
+  RxMap<String, dynamic>? _getMapByCategory(String category) {
     switch (category) {
       case 'activities':
         return activities;
