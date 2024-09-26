@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kijani_pmc_app/services/aws.dart';
@@ -15,17 +16,13 @@ class ReportsController extends GetxController {
 
   @override
   void onInit() {
-    super.onInit();
     countUnSyncedReports();
+    super.onInit();
   }
 
   Future<String> submitReport({
     required Map<String, dynamic> reportData,
   }) async {
-    //convert image file paths to usable image names and paths
-    // reportData['Garden challenges photos'] = ImageNamesAndPaths()
-    //     .getImagesNamesAndPaths(
-    //         imagesData: reportData['Garden challenges photos']);
     //prepare data to submit to airtable
     Map<String, dynamic> dataToSubmit = reportData;
     //upload images to aws
@@ -59,7 +56,7 @@ class ReportsController extends GetxController {
     if (response.keys.first == 'success') {
       return response['success'];
     } else {
-      print("Data to Submit: $dataToSubmit");
+      if (kDebugMode) print("Data to Submit: $dataToSubmit");
       return await storeFailedReport(data: reportData)
           ? "${response['failed']}. Stored!"
           : "${response['failed']}. Failed to store!";
@@ -106,25 +103,24 @@ class ReportsController extends GetxController {
         reportsData.isNotEmpty) {
       String firstKey = reportsData.keys.first;
       Map<String, dynamic> targetData = reportsData[firstKey];
-
+      Map<String, dynamic> dataToSubmit = targetData;
       //upload images to aws
-      Map<String, dynamic> photos = targetData['Garden challenges photos'];
-      int numPhotos = photos.length;
-      Map<String, dynamic> uploaded = await awsAccess.uploadPhotosMap(
-          photosData: photos, numPhotos: numPhotos);
-      if (uploaded['msg'] == "success") {
-        //prepare data to submit to airtable
-        Map<String, dynamic> dataToSubmit = targetData;
-
-        //convert uploaded photos urls to a comma separated string
-        Map<String, dynamic> photosUrls = uploaded['data'];
-        String photosString = "";
-        for (String url in photosUrls.keys) {
-          photosString += url == photosUrls.keys.last
-              ? photosUrls[url]
-              : "${photosUrls[url]}, ";
+      if (targetData['Garden challenges photos'] != null) {
+        Map<String, dynamic> photos = targetData['Garden challenges photos'];
+        int numPhotos = photos.length;
+        Map<String, dynamic> uploaded = await awsAccess.uploadPhotosMap(
+            photosData: photos, numPhotos: numPhotos);
+        if (uploaded['msg'] == "success") {
+          //convert uploaded photos urls to a comma separated string
+          Map<String, dynamic> photosUrls = uploaded['data'];
+          String photosString = "";
+          for (String url in photosUrls.keys) {
+            photosString += url == photosUrls.keys.last
+                ? photosUrls[url]
+                : "${photosUrls[url]}, ";
+          }
+          dataToSubmit['Garden challenges photos'] = photosString;
         }
-        dataToSubmit['Garden challenges photos'] = photosString;
 
         // submit data
         Map<String, dynamic> response = await airtableAccess.createRecord(
