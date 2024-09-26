@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:kijani_pmc_app/controllers/reports_controller.dart';
 import 'package:kijani_pmc_app/controllers/user_controller.dart';
 import 'package:kijani_pmc_app/screens/login_screen.dart';
 import 'package:kijani_pmc_app/screens/main_screen.dart';
@@ -9,8 +10,10 @@ import 'package:kijani_pmc_app/screens/main_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // await FMTCObjectBoxBackend().initialise();
-  // await const FMTCStore('mapStore').manage.create();
+  // Register the ReportsController here
+  Get.put(ReportsController()); // Registering ReportsController globally
+  Get.put(UserController()); // Already registered UserController
+
   runApp(const MyApp());
 }
 
