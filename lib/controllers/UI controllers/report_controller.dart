@@ -49,13 +49,13 @@ class ReportController extends GetxController {
   ].obs;
 
   // State tracking map for individual challenges
-  var selectedIndividualChallenges = <String, bool>{}.obs;
+  var selectedIndividualChallenges = <String, dynamic>{}.obs;
 
   // Maps to store details for each category when selected
-  var activityDetails = <String, String>{}.obs;
+  var activityDetails = <String, dynamic>{}.obs;
   var gardenChallengeDetails = <String, dynamic>{}.obs;
-  var farmerChallengeDetails = <String, String>{}.obs;
-  var individualChallengeDetails = <String, String>{}.obs;
+  var farmerChallengeDetails = <String, dynamic>{}.obs;
+  var individualChallengeDetails = <String, dynamic>{}.obs;
 
   @override
   void onInit() {
@@ -97,8 +97,7 @@ class ReportController extends GetxController {
         .where((entry) => entry.value)
         .map((entry) => {
               'item': entry.key,
-              'details': detailsMap[entry.key]?.toString() ??
-                  '', //TODO: this could be causing problems
+              'details': detailsMap[entry.key],
             })
         .toList();
   }
