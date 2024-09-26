@@ -1,10 +1,14 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kijani_pmc_app/controllers/UI%20controllers/report_controller.dart';
+import 'package:kijani_pmc_app/controllers/reports_controller.dart';
 import 'package:kijani_pmc_app/utilities/constants.dart';
 import 'package:kijani_pmc_app/utilities/image_picker.dart';
+
+import '../../controllers/user_controller.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -16,6 +20,8 @@ class ReportScreen extends StatefulWidget {
 class _ReportScreenState extends State<ReportScreen> {
   static final _formKey = GlobalKey<FormState>();
   TextEditingController descController = TextEditingController();
+  final UserController pmcCtrl = Get.find();
+  final ReportsController dataController = Get.put(ReportsController());
 
   @override
   Widget build(BuildContext context) {
@@ -435,27 +441,114 @@ class _ReportScreenState extends State<ReportScreen> {
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.all(14),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
+                          //initialise a map to hold report data to submit
+                          Map<String, dynamic> dataToSubmit = {};
+
+                          //add coordinator
+                          dataToSubmit['Coordinator'] =
+                              "${pmcCtrl.branchData['branch']} | ${pmcCtrl.branchData['coordinator']}";
+
+                          //add activities and their numbers
                           final selectedActivities = controller
                               .getSelectedItemsWithDetails('activities');
+                          List activitiesToSubmit = [];
+                          for (Map<String, dynamic> activity
+                              in selectedActivities) {
+                            activitiesToSubmit.add(activity['item']);
+                            activity['item'] == 'Weeding'
+                                ? dataToSubmit['Gardens weeded'] =
+                                    int.parse(activity['details'])
+                                : activity['item'] == 'Pruning'
+                                    ? dataToSubmit['Gardens pruned'] =
+                                        int.parse(activity['details'])
+                                    : activity['item'] == 'Thinning'
+                                        ? dataToSubmit['Gardens thinned'] =
+                                            int.parse(activity['details'])
+                                        : activity['item'] ==
+                                                'Pest and disease control'
+                                            ? dataToSubmit['Gardens pest and disease Controlled'] =
+                                                int.parse(activity['details'])
+                                            : activity['item'] ==
+                                                    'Fire line creation'
+                                                ? dataToSubmit['Gardens fire lines created'] = int.parse(
+                                                    activity['details'])
+                                                : activity['item'] ==
+                                                        'Farmer contract signing'
+                                                    ? dataToSubmit['Farmer contracts signed'] =
+                                                        int.parse(
+                                                            activity['details'])
+                                                    : activity['item'] ==
+                                                            'Identifying outstanding farmers'
+                                                        ? dataToSubmit['Outstanding farmers identified'] = int.parse(
+                                                            activity['details'])
+                                                        : activity['item'] ==
+                                                                'Groups mobilization'
+                                                            ? dataToSubmit['Groups remobilized'] =
+                                                                int.parse(activity['details'])
+                                                            : activity['item'] == 'Farmers mobilization'
+                                                                ? dataToSubmit['Farmers mobilized'] = int.parse(activity['details'])
+                                                                : Get.snackbar("Error:", "Found wrong activity");
+                          }
+                          dataToSubmit['Activities'] = activitiesToSubmit;
+
+                          //add gardens challenges and photos
                           final selectedGardenChallenges = controller
                               .getSelectedItemsWithDetails('gardenChallenges');
+                          List gardenChallengesToSubmit = [];
+                          Map<String, dynamic> challengesPhotos = {};
+                          for (Map<String, dynamic> challenge
+                              in selectedGardenChallenges) {
+                            gardenChallengesToSubmit.add(challenge['item']);
+                            challengesPhotos[challenge['item']] = {
+                              'imagePath': challenge['details']['photoPath'],
+                              'imageName': challenge['details']['name'],
+                            };
+                          }
+                          dataToSubmit['Garden challenges'] =
+                              gardenChallengesToSubmit;
+                          dataToSubmit['Garden challenges photos'] =
+                              challengesPhotos;
+
+                          // add farmer challenges and their details (numbers)
                           final selectedFarmerChallenges = controller
                               .getSelectedItemsWithDetails('farmerChallenges');
+                          List farmerChallengesToSubmit = [];
+                          for (Map<String, dynamic> challenge
+                              in selectedFarmerChallenges) {
+                            farmerChallengesToSubmit.add(challenge['item']);
+                            dataToSubmit[challenge['item']] =
+                                int.parse(challenge['details']);
+                          }
+                          dataToSubmit['Farmer challenges'] =
+                              farmerChallengesToSubmit;
+
+                          // add personal challenges
+                          List individualChallengesToSubmit = [];
                           final selectedIndividualChallenges =
                               controller.getSelectedItemsWithDetails(
                                   'individualChallenges');
-                          final description = descController.text;
+                          for (Map<String, dynamic> challenges
+                              in selectedIndividualChallenges) {
+                            individualChallengesToSubmit
+                                .add(challenges['item']);
+                          }
+                          dataToSubmit['Personal challenges'] =
+                              individualChallengesToSubmit;
 
-                          print('Selected Activities: $selectedActivities');
-                          print(
-                              'Selected Garden Challenges: $selectedGardenChallenges');
-                          print(
-                              'Selected Farmer Challenges: $selectedFarmerChallenges');
-                          print(
-                              'Selected Individual Challenges: $selectedIndividualChallenges');
-                          print('description: $description');
+                          //add description
+                          final description = descController.text;
+                          dataToSubmit['Description'] = description;
+
+                          //add date
+                          dataToSubmit['Date'] =
+                              "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
+
+                          //submit data
+                          String submitted = await dataController.submitReport(
+                              reportData: dataToSubmit);
+                          print("Response: $submitted");
                         }
                       },
                       child: const Text('Submit Report'),
