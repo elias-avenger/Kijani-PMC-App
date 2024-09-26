@@ -19,44 +19,43 @@ class ReportsController extends GetxController {
     // reportData['Garden challenges photos'] = ImageNamesAndPaths()
     //     .getImagesNamesAndPaths(
     //         imagesData: reportData['Garden challenges photos']);
-
+    //prepare data to submit to airtable
+    Map<String, dynamic> dataToSubmit = reportData;
     //upload images to aws
-    Map<String, dynamic> photos = reportData['Garden challenges photos'];
-    int numPhotos = photos.length;
-    Map<String, dynamic> uploaded = await awsAccess.uploadPhotosMap(
-        photosData: photos, numPhotos: numPhotos);
-
-    if (uploaded['msg'] == "success") {
-      //prepare data to submit to airtable
-      Map<String, dynamic> dataToSubmit = reportData;
-
-      //convert uploaded photos urls to a comma separated string
-      Map<String, dynamic> photosUrls = uploaded['data'];
-      String photosString = "";
-      for (String url in photosUrls.keys) {
-        photosString += url == photosUrls.keys.last
-            ? photosUrls[url]
-            : "${photosUrls[url]}, ";
-      }
-      dataToSubmit['Garden challenges photos'] = photosString;
-
-      // submit data
-      Map<String, dynamic> response = await airtableAccess.createRecord(
-        data: dataToSubmit,
-        baseId: 'appoW7X8Lz3bIKpEE',
-        table: 'PMC Reports',
-      );
-      if (response.keys.first == 'success') {
-        return response['success'];
+    if (reportData['Garden challenges photos'] != null) {
+      Map<String, dynamic> photos = reportData['Garden challenges photos'];
+      int numPhotos = photos.length;
+      Map<String, dynamic> uploaded = await awsAccess.uploadPhotosMap(
+          photosData: photos, numPhotos: numPhotos);
+      if (uploaded['msg'] == "success") {
+        //convert uploaded photos urls to a comma separated string
+        Map<String, dynamic> photosUrls = uploaded['data'];
+        String photosString = "";
+        for (String url in photosUrls.keys) {
+          photosString += url == photosUrls.keys.last
+              ? photosUrls[url]
+              : "${photosUrls[url]}, ";
+        }
+        dataToSubmit['Garden challenges photos'] = photosString;
       } else {
         return await storeFailedReport(data: reportData)
-            ? "${response['failed']}. Stored!"
-            : "${response['failed']}. Failed to store!";
+            ? "${uploaded['msg']}. Stored!"
+            : "${uploaded['msg']}. Failed to store!";
       }
+    }
+    // submit data
+    Map<String, dynamic> response = await airtableAccess.createRecord(
+      data: dataToSubmit,
+      baseId: 'appoW7X8Lz3bIKpEE',
+      table: 'PMC Reports',
+    );
+    if (response.keys.first == 'success') {
+      return response['success'];
     } else {
+      print("Data to Submit: $dataToSubmit");
       return await storeFailedReport(data: reportData)
-          ? "${uploaded['msg']}. Stored!"
-          : "${uploaded['msg']}. Failed to store!";
+          ? "${response['failed']}. Stored!"
+          : "${response['failed']}. Failed to store!";
     }
   }
 
