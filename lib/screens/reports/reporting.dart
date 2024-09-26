@@ -572,6 +572,7 @@ class _ReportScreenState extends State<ReportScreen> {
                             );
                             Get.off(const MainScreen());
                           } else if (submitted == 'No internet. Stored!') {
+                            dataController.countUnSyncedReports();
                             Get.snackbar(
                               'No internet',
                               'Report stored locally',
@@ -581,6 +582,7 @@ class _ReportScreenState extends State<ReportScreen> {
                             );
                             Get.off(const MainScreen());
                           } else {
+                            dataController.countUnSyncedReports();
                             Get.snackbar(
                               'Error',
                               'Report submission failed',
