@@ -1,12 +1,16 @@
 import 'dart:io';
 
+import 'package:easy_loading_button/easy_loading_button.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kijani_pmc_app/controllers/UI%20controllers/report_controller.dart';
 import 'package:kijani_pmc_app/controllers/reports_controller.dart';
+import 'package:kijani_pmc_app/screens/main_screen.dart';
 import 'package:kijani_pmc_app/utilities/constants.dart';
 import 'package:kijani_pmc_app/utilities/image_picker.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 import '../../controllers/user_controller.dart';
 
@@ -435,11 +439,21 @@ class _ReportScreenState extends State<ReportScreen> {
                     ),
                     const SizedBox(height: 20),
                     // Submit Button
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kijaniGreen,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.all(14),
+                    EasyButton(
+                      height: 65,
+                      borderRadius: 16.0,
+                      buttonColor: kijaniGreen,
+                      idleStateWidget: const Text(
+                        'Submit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                      ),
+                      loadingStateWidget:
+                          LoadingAnimationWidget.fourRotatingDots(
+                        color: Colors.white,
+                        size: 30,
                       ),
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
@@ -548,10 +562,36 @@ class _ReportScreenState extends State<ReportScreen> {
                           //submit data
                           String submitted = await dataController.submitReport(
                               reportData: dataToSubmit);
-                          print("Response: $submitted");
+                          if (submitted == 'success') {
+                            Get.snackbar(
+                              'Success',
+                              'Report submitted successfully',
+                              backgroundColor: Colors.green,
+                              colorText: Colors.white,
+                              duration: const Duration(seconds: 7),
+                            );
+                            Get.off(const MainScreen());
+                          } else if (submitted == 'No internet. Stored!') {
+                            Get.snackbar(
+                              'No internet',
+                              'Report stored locally',
+                              backgroundColor: Colors.blue,
+                              colorText: Colors.white,
+                              duration: const Duration(seconds: 7),
+                            );
+                            Get.off(const MainScreen());
+                          } else {
+                            Get.snackbar(
+                              'Error',
+                              'Report submission failed',
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                              duration: const Duration(seconds: 7),
+                            );
+                          }
+                          if (kDebugMode) print("Response: $submitted");
                         }
                       },
-                      child: const Text('Submit Report'),
                     ),
                   ],
                 );
