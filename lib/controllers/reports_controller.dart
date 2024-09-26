@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:kijani_pmc_app/services/aws.dart';
 import 'package:kijani_pmc_app/services/http_airtable.dart';
 import 'package:kijani_pmc_app/services/internet_check.dart';
-import 'package:kijani_pmc_app/utilities/img_names_paths.dart';
 
 import '../services/local_storage.dart';
 
@@ -17,9 +16,9 @@ class ReportsController extends GetxController {
     required Map<String, dynamic> reportData,
   }) async {
     //convert image file paths to usable image names and paths
-    reportData['Garden challenges photos'] = ImageNamesAndPaths()
-        .getImagesNamesAndPaths(
-            imagesData: reportData['Garden challenges photos']);
+    // reportData['Garden challenges photos'] = ImageNamesAndPaths()
+    //     .getImagesNamesAndPaths(
+    //         imagesData: reportData['Garden challenges photos']);
 
     //upload images to aws
     Map<String, dynamic> photos = reportData['Garden challenges photos'];
