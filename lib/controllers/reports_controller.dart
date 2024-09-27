@@ -48,18 +48,24 @@ class ReportsController extends GetxController {
       }
     }
     // submit data
-    Map<String, dynamic> response = await airtableAccess.createRecord(
-      data: dataToSubmit,
-      baseId: 'appoW7X8Lz3bIKpEE',
-      table: 'PMC Reports',
-    );
-    if (response.keys.first == 'success') {
-      return response['success'];
+    if (await internetCheck.getAirtableConMessage() == "connected") {
+      Map<String, dynamic> response = await airtableAccess.createRecord(
+        data: dataToSubmit,
+        baseId: 'appoW7X8Lz3bIKpEE',
+        table: 'PMC Reports',
+      );
+      if (response.keys.first == 'success') {
+        return response['success'];
+      } else {
+        if (kDebugMode) print("Data to Submit: $dataToSubmit");
+        return await storeFailedReport(data: reportData)
+            ? "${response['failed']}. Stored!"
+            : "${response['failed']}. Failed to store!";
+      }
     } else {
-      if (kDebugMode) print("Data to Submit: $dataToSubmit");
       return await storeFailedReport(data: reportData)
-          ? "${response['failed']}. Stored!"
-          : "${response['failed']}. Failed to store!";
+          ? "No internet. Stored!"
+          : "No internet. Failed to store!";
     }
   }
 
@@ -86,7 +92,7 @@ class ReportsController extends GetxController {
     String awsAccessMsg = await internetCheck.getAWSConMessage();
     String airtableAccessMsg = await internetCheck.getAirtableConMessage();
 
-    //show snackbar if not connected to internet
+    //show snackBar if not connected to internet
     if (awsAccessMsg != "connected" || airtableAccessMsg != "connected") {
       Get.snackbar(
         "Unable to Sync",
@@ -129,11 +135,13 @@ class ReportsController extends GetxController {
           table: 'PMC Reports',
         );
         if (response.keys.first == 'success') {
-          await myPrefs.removeUnSyncedData(
+          String removed = await myPrefs.removeUnSyncedData(
             type: 'failedReports',
             key: firstKey,
-            data: targetData,
           );
+          if (kDebugMode) {
+            print("Data removed: $removed");
+          }
         }
       }
       reportsData = await myPrefs.getData(key: 'failedReports');
