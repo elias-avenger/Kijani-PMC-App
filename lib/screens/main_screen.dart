@@ -15,10 +15,10 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final UserController pmcCtrl = Get.find();
+    final UserController pmcCtrl = Get.find<UserController>();
     // Initialize the controller
     //final userController = Get.put(UserController());
-    final reportController = Get.put(ReportsController());
+    final reportController = Get.find<ReportsController>();
 
     return Scaffold(
       appBar: AppBar(
@@ -92,65 +92,68 @@ class MainScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              if (reportController.unSyncedReports > 0)
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  margin: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      //unsyced daily reports
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Unsynced Daily Report(s)',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Obx(
-                            () => Text(
-                              reportController.unSyncedReports.toString(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 18),
-                      EasyButton(
-                        height: 65,
-                        borderRadius: 16.0,
-                        buttonColor: Colors.white,
-                        idleStateWidget: const Text(
-                          'Sync Now',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 18,
-                          ),
+              Obx(
+                () => reportController.unSyncedReports.value > 0
+                    ? Container(
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        loadingStateWidget:
-                            LoadingAnimationWidget.fourRotatingDots(
-                                color: Colors.white, size: 30),
-                        onPressed: () async {
-                          await reportController.uploadUnSyncedReports();
-                        },
-                      ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            //unsyced daily reports
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Unsynced Daily Report(s)',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  reportController.unSyncedReports.toString(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 18),
+                            EasyButton(
+                              height: 65,
+                              borderRadius: 16.0,
+                              buttonColor: Colors.white,
+                              idleStateWidget: const Text(
+                                'Sync Now',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              loadingStateWidget:
+                                  LoadingAnimationWidget.fourRotatingDots(
+                                      color: Colors.red, size: 30),
+                              onPressed: () async {
+                                await reportController.uploadUnSyncedReports();
+                              },
+                            ),
 
-                      const SizedBox(height: 8),
-                    ],
-                  ),
-                ),
+                            const SizedBox(height: 8),
+                          ],
+                        ),
+                      )
+                    : const SizedBox(
+                        height: 0,
+                      ),
+              ),
               Text(
                 'You have ${pmcCtrl.branchData['parishes'].length} assigned parishes',
                 style: TextStyle(
@@ -176,8 +179,6 @@ class MainScreen extends StatelessWidget {
                             const WidgetStatePropertyAll(Size(300, 60)),
                       ),
                       onPressed: () {
-                        //TODO: Navigate to parish screen
-                        //Get.to(ParishScreen(parish: parish));
                         Get.snackbar(
                           'Coming Soon',
                           'This feature is coming soon',

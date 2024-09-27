@@ -403,7 +403,7 @@ class _ReportScreenState extends State<ReportScreen> {
                     // Display selected individual challenges
                     if (controller.selectedIndividualChallenges
                         .containsValue(true))
-                      Wrap(
+                      Column(
                         children: [
                           const Text('Selected challenges:'),
                           for (String challenge
