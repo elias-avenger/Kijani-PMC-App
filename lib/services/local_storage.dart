@@ -23,9 +23,9 @@ class LocalStorage {
   Future<String> removeUnSyncedData({
     required String type,
     required String key,
-    required Map<String, dynamic> data,
   }) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, dynamic> data = await getData(key: type);
     var removed = await data.remove(key);
     if (removed != null) {
       data.isNotEmpty
