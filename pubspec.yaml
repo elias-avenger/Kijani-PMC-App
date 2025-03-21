@@ -43,6 +43,12 @@ dependencies:
   hugeicons: ^0.0.10
   flutter_map: ^8.1.1
   flutter_map_tile_caching: ^10.1.1
+  s3_storage:
+    git:
+      url: https://github.com/elias-avenger/s3_storage_package
+      ref: master
+  native_exif: ^0.6.0
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
