@@ -7,8 +7,8 @@ import 'package:path_provider/path_provider.dart';
 class ExifUtils {
   static Future<bool> checkIfImageHasLocation(String imagePath) async {
     try {
-      final exif = await Exif.fromPath(imagePath);
-      final latLong = await exif.getLatLong();
+      Exif exif = await Exif.fromPath(imagePath);
+      ExifLatLong? latLong = await exif.getLatLong();
       await exif.close();
       return latLong != null;
     } catch (e) {
@@ -23,7 +23,7 @@ class ExifUtils {
     double longitude,
   ) async {
     try {
-      final exif = await Exif.fromPath(imagePath);
+      Exif exif = await Exif.fromPath(imagePath);
       await exif.writeAttributes({
         'GPSLatitude': latitude.abs().toString(),
         'GPSLatitudeRef': latitude >= 0 ? 'N' : 'S',
@@ -32,10 +32,10 @@ class ExifUtils {
       });
 
       // Use path_provider to get the documents directory
-      final dir = await getApplicationDocumentsDirectory();
+      Directory dir = await getApplicationDocumentsDirectory();
       // Manually construct the path without 'path' package
-      final newPath = '${dir.path}/temp_for_exif.jpg';
-      final newFile = File(newPath);
+      String newPath = '${dir.path}/temp_for_exif.jpg';
+      File newFile = File(newPath);
       await newFile.writeAsBytes(await File(imagePath).readAsBytes());
 
       Exif newExif = await Exif.fromPath(newPath);
@@ -43,7 +43,9 @@ class ExifUtils {
       await newExif.close();
 
       if (latLong != null && kDebugMode) {
-        print('Location embedded: $latitude, $longitude');
+        if (kDebugMode) {
+          print('Location embedded: $latitude, $longitude');
+        }
       } else if (kDebugMode) {
         print('Failed to embed GPS data');
       }
