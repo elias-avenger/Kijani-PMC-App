@@ -37,14 +37,14 @@ class Locator {
   Future<Position?> getCurrentPosition() async {
     try {
       // Ensure permissions are granted
-      final hasPermission = await _checkAndRequestPermissions();
+      bool hasPermission = await _checkAndRequestPermissions();
       if (!hasPermission) {
         return null;
       }
 
       // Fetch the current position
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation,
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: LocationSettings(accuracy: LocationAccuracy.best),
       );
       return position;
     } catch (e) {
