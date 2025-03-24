@@ -29,98 +29,19 @@ class Group {
 
   factory Group.fromAirtable(AirtableRecord record) {
     try {
-      if (record == null) {
-        throw GroupParsingException('Airtable record is null');
-      }
       final fields = record.fields;
       if (fields == null) {
         throw GroupParsingException('Fields map is null in Airtable record');
       }
 
-      final id = record.id;
-      if (id == null || id.isEmpty) {
-        throw GroupParsingException('Record ID is missing or empty');
-      }
-
-      final name = fields['Group Name'];
-      if (name != null && name is! String) {
-        throw GroupParsingException(
-          'Group Name must be a String, got ${name.runtimeType}',
-        );
-      }
-
-      final parishId = fields['Parish ID'];
-      if (parishId != null && parishId is! String) {
-        throw GroupParsingException(
-          'Parish ID must be a String, got ${parishId.runtimeType}',
-        );
-      }
-
-      // Handle Coordinates with improved error checking
-      String coordinates = '';
-      final coordinatesList = fields['Coordinates'];
-      if (coordinatesList != null) {
-        if (coordinatesList is! List<dynamic>) {
-          throw GroupParsingException(
-            'Coordinates must be a List, got ${coordinatesList.runtimeType}',
-          );
-        }
-        if (coordinatesList.isNotEmpty) {
-          final firstCoord = coordinatesList.first;
-          if (firstCoord != null && firstCoord is String) {
-            coordinates = firstCoord;
-          } else {
-            print(
-              'Warning: First Coordinate is null or not a String (${firstCoord.runtimeType}), using empty string',
-            );
-          }
-        }
-      }
-
-      String? parish;
-      final parishValue = fields['Parish'];
-      if (parishValue != null) {
-        if (parishValue is! String) {
-          print(
-            'Warning: Parish should be a String, got ${parishValue.runtimeType}, ignoring',
-          );
-        } else {
-          parish = parishValue;
-        }
-      }
-
-      int? no;
-      final noValue = fields['No_'];
-      if (noValue != null) {
-        if (noValue is! int) {
-          print(
-            'Warning: No_ should be an int, got ${noValue.runtimeType}, ignoring',
-          );
-        } else {
-          no = noValue;
-        }
-      }
-
-      int? seasonsCount;
-      final seasonsCountValue = fields['Seasons_count'];
-      if (seasonsCountValue != null) {
-        if (seasonsCountValue is! int) {
-          print(
-            'Warning: Seasons_count should be an int, got ${seasonsCountValue.runtimeType}, ignoring',
-          );
-        } else {
-          seasonsCount = seasonsCountValue;
-        }
-      }
-
       return Group(
-        id: id,
-        name: name as String? ?? '',
-        parishId: parishId as String? ?? '',
-        coordinates: coordinates,
-        parish: parish,
-        no: no,
-        seasonsCount: seasonsCount,
+        id: _requireString(record.id, 'Record ID'),
+        name: _requireString(fields['Group Name'], 'Group Name'),
+        parishId: _requireString(fields['Parish ID'], 'Parish ID'),
+        coordinates: _parseFirstStringInList(fields['Coordinates']),
+        parish: _parseOptionalString(fields['Parish']),
+        no: _parseOptionalInt(fields['No_']),
+        seasonsCount: _parseOptionalInt(fields['Seasons_count']),
       );
     } catch (e) {
       throw GroupParsingException('Failed to parse Group from Airtable: $e');
@@ -129,68 +50,14 @@ class Group {
 
   factory Group.fromJson(Map<String, dynamic> json) {
     try {
-      if (json == null) {
-        throw GroupParsingException('JSON map is null');
-      }
-
-      final id = json['id'];
-      if (id == null || id is! String || (id as String).isEmpty) {
-        throw GroupParsingException('id is missing, not a String, or empty');
-      }
-
-      final name = json['name'];
-      if (name == null || name is! String) {
-        throw GroupParsingException('name is missing or not a String');
-      }
-
-      final parishId = json['parishId'];
-      if (parishId == null || parishId is! String) {
-        throw GroupParsingException('parishId is missing or not a String');
-      }
-
-      final coordinates = json['coordinates'];
-      if (coordinates == null || coordinates is! String) {
-        throw GroupParsingException('coordinates is missing or not a String');
-      }
-
-      String? parish;
-      final parishValue = json['parish'];
-      if (parishValue != null && parishValue is! String) {
-        print(
-          'Warning: parish should be a String, got ${parishValue.runtimeType}, ignoring',
-        );
-      } else {
-        parish = parishValue as String?;
-      }
-
-      int? no;
-      final noValue = json['no'];
-      if (noValue != null && noValue is! int) {
-        print(
-          'Warning: no should be an int, got ${noValue.runtimeType}, ignoring',
-        );
-      } else {
-        no = noValue as int?;
-      }
-
-      int? seasonsCount;
-      final seasonsCountValue = json['seasonsCount'];
-      if (seasonsCountValue != null && seasonsCountValue is! int) {
-        print(
-          'Warning: seasonsCount should be an int, got ${seasonsCountValue.runtimeType}, ignoring',
-        );
-      } else {
-        seasonsCount = seasonsCountValue as int?;
-      }
-
       return Group(
-        id: id,
-        name: name,
-        parishId: parishId,
-        coordinates: coordinates,
-        parish: parish,
-        no: no,
-        seasonsCount: seasonsCount,
+        id: _requireString(json['id'], 'id'),
+        name: _requireString(json['name'], 'name'),
+        parishId: _requireString(json['parishId'], 'parishId'),
+        coordinates: _requireString(json['coordinates'], 'coordinates'),
+        parish: _parseOptionalString(json['parish']),
+        no: _parseOptionalInt(json['no']),
+        seasonsCount: _parseOptionalInt(json['seasonsCount']),
       );
     } catch (e) {
       throw GroupParsingException('Failed to parse Group from JSON: $e');
@@ -207,5 +74,33 @@ class Group {
       'no': no,
       'seasonsCount': seasonsCount,
     };
+  }
+
+  // Helper methods for parsing fields
+
+  static String _requireString(dynamic value, String field) {
+    if (value is String && value.trim().isNotEmpty) return value;
+    throw GroupParsingException(
+      '$field is required and must be a non-empty String',
+    );
+  }
+
+  static String _parseFirstStringInList(dynamic value) {
+    if (value is List && value.isNotEmpty && value.first is String) {
+      return value.first;
+    }
+    return '';
+  }
+
+  static String? _parseOptionalString(dynamic value) {
+    if (value == null) return null;
+    if (value is String) return value;
+    return null;
+  }
+
+  static int? _parseOptionalInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    return null;
   }
 }
