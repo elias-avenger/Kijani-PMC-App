@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:airtable_crud/airtable_plugin.dart';
 
 class GardenParsingException implements Exception {
@@ -11,19 +10,19 @@ class GardenParsingException implements Exception {
 
 class Garden {
   final String id;
-  final String group;
-  final String plantingDate;
-  final String geojson; // Stored as a JSON string
-  final String centerPoint; // Stored as "lat,lng"
+  final String groupId;
+  final String? plantingDate;
+  final String? centerPoint;
+  final String geojson;
   final String farmerId;
   final List<String> species;
 
   Garden({
     required this.id,
-    required this.group,
-    required this.plantingDate,
+    required this.groupId,
+    this.plantingDate,
+    this.centerPoint,
     required this.geojson,
-    required this.centerPoint,
     required this.farmerId,
     required this.species,
   });
@@ -31,18 +30,63 @@ class Garden {
   factory Garden.fromAirtable(AirtableRecord record) {
     try {
       final fields = record.fields;
+      final id = record.id;
+
+      if (id == null || id.trim().isEmpty) {
+        throw GardenParsingException('Record ID is required');
+      }
+      if (fields == null) {
+        throw GardenParsingException('Fields are missing in Airtable record');
+      }
+
+      final groupIdRaw = fields['Group ID'];
+      final groupId =
+          groupIdRaw is List && groupIdRaw.isNotEmpty
+              ? groupIdRaw.first.toString()
+              : groupIdRaw is String
+              ? groupIdRaw
+              : '';
+      if (groupId.trim().isEmpty) {
+        throw GardenParsingException('Group ID is missing or invalid');
+      }
+
+      final geojsonList = fields['Polygon GeoJSON'];
+      if (geojsonList is! List ||
+          geojsonList.isEmpty ||
+          geojsonList.first is! String) {
+        throw GardenParsingException('Polygon GeoJSON must be a List<String>');
+      }
+
+      final centerPointList = fields['Center Point'];
+      final centerPoint =
+          centerPointList is List && centerPointList.isNotEmpty
+              ? centerPointList.first.toString()
+              : null;
+
+      final farmerId = fields['Farmer ID'];
+      if (farmerId is! String || farmerId.trim().isEmpty) {
+        throw GardenParsingException('Farmer ID is missing');
+      }
+
+      final plantingDate =
+          fields['Initial planting date'] is String
+              ? fields['Initial planting date'] as String
+              : null;
+
+      final speciesRaw = fields['Species'];
+      final species =
+          speciesRaw is List
+              ? speciesRaw.whereType<String>().toList()
+              : <String>[];
 
       return Garden(
-        id: _requireString(record.id, 'Record ID'),
-        group: _requireString(fields['Group'], 'Group'),
-        plantingDate: _requireString(
-          fields['Initial planting date'],
-          'Initial planting date',
-        ),
-        geojson: _requireGeoJson(fields['Polygon GeoJSON']),
-        centerPoint: _requireLatLngList(fields['Center Point']),
-        farmerId: _requireString(fields['Farmer ID'], 'Farmer ID'),
-        species: _parseSpeciesList(fields['Species']),
+        id: id,
+        groupId: groupId,
+        plantingDate: plantingDate,
+        centerPoint: centerPoint,
+        geojson: geojsonList.first,
+        farmerId: farmerId,
+        species: species,
       );
     } catch (e) {
       throw GardenParsingException('Failed to parse Garden from Airtable: $e');
@@ -52,13 +96,15 @@ class Garden {
   factory Garden.fromJson(Map<String, dynamic> json) {
     try {
       return Garden(
-        id: _requireString(json['id'], 'id'),
-        group: _requireString(json['group'], 'group'),
-        plantingDate: _requireString(json['plantingDate'], 'plantingDate'),
-        geojson: _requireString(json['geojson'], 'geojson'),
-        centerPoint: _requireString(json['centerPoint'], 'centerPoint'),
-        farmerId: _requireString(json['farmerId'], 'farmerId'),
-        species: _parseSpeciesList(json['species']),
+        id: json['id'] as String,
+        groupId: json['groupId'] as String,
+        plantingDate: json['plantingDate'] as String?,
+        centerPoint: json['centerPoint'] as String?,
+        geojson: json['geojson'] as String,
+        farmerId: json['farmerId'] as String,
+        species:
+            (json['species'] as List<dynamic>?)?.whereType<String>().toList() ??
+            [],
       );
     } catch (e) {
       throw GardenParsingException('Failed to parse Garden from JSON: $e');
@@ -68,59 +114,12 @@ class Garden {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'group': group,
+      'groupId': groupId,
       'plantingDate': plantingDate,
-      'geojson': geojson,
       'centerPoint': centerPoint,
+      'geojson': geojson,
       'farmerId': farmerId,
       'species': species,
     };
-  }
-
-  // ────────────────────────────────
-  // 🔧 Helpers
-  // ────────────────────────────────
-
-  static String _requireString(dynamic value, String fieldName) {
-    if (value is String && value.trim().isNotEmpty) return value;
-    throw GardenParsingException(
-      '$fieldName is required and must be a non-empty String',
-    );
-  }
-
-  static String _requireGeoJson(dynamic value) {
-    if (value is List && value.isNotEmpty && value.first is Map) {
-      try {
-        return jsonEncode(value.first); // serialize only first polygon
-      } catch (e) {
-        throw GardenParsingException(
-          'Failed to encode Polygon GeoJSON to JSON: $e',
-        );
-      }
-    }
-    throw GardenParsingException(
-      'Polygon GeoJSON must be a non-empty List<Map>',
-    );
-  }
-
-  static String _requireLatLngList(dynamic value) {
-    if (value is List && value.length >= 2) {
-      final lat = value[0]?.toString();
-      final lng = value[1]?.toString();
-      if (lat != null && lng != null) return '$lat,$lng';
-    }
-    throw GardenParsingException(
-      'Center Point must be a List with at least two numeric values',
-    );
-  }
-
-  static List<String> _parseSpeciesList(dynamic value) {
-    if (value is List) {
-      return value
-          .where((e) => e is String && e.trim().isNotEmpty)
-          .map((e) => e as String)
-          .toList();
-    }
-    throw GardenParsingException('Species must be a List<String>');
   }
 }

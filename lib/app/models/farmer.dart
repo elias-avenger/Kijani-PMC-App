@@ -14,8 +14,8 @@ class Farmer {
   final String firstName;
   final String lastName;
   final String gender;
-  final String dateOfBirth;
-  final String phoneNumber;
+  final String? dateOfBirth;
+  final String? phoneNumber;
   final String? fullFarmerId;
   final String? farmerGardens;
   final String? registeredFrom;
@@ -30,8 +30,8 @@ class Farmer {
     required this.firstName,
     required this.lastName,
     required this.gender,
-    required this.dateOfBirth,
-    required this.phoneNumber,
+    this.dateOfBirth,
+    this.phoneNumber,
     this.fullFarmerId,
     this.farmerGardens,
     this.registeredFrom,
@@ -44,22 +44,60 @@ class Farmer {
   factory Farmer.fromAirtable(AirtableRecord record) {
     try {
       final fields = record.fields;
+      if (record.id == null || record.id!.trim().isEmpty) {
+        throw FarmerParsingException('Record ID is required');
+      }
+      if (fields == null) {
+        throw FarmerParsingException('Fields map is null');
+      }
+
+      final farmerId = fields['ID'];
+      final firstName = fields['First Name'];
+      final lastName = fields['Last Name'];
+      final gender = fields['Gender'];
+
+      if (farmerId is! String || farmerId.trim().isEmpty) {
+        throw FarmerParsingException('ID is required');
+      }
+      if (firstName is! String || firstName.trim().isEmpty) {
+        throw FarmerParsingException('First Name is required');
+      }
+      if (lastName is! String || lastName.trim().isEmpty) {
+        throw FarmerParsingException('Last Name is required');
+      }
+      if (gender is! String || gender.trim().isEmpty) {
+        throw FarmerParsingException('Gender is required');
+      }
 
       return Farmer(
-        id: _require(record.id, 'Record ID'),
-        farmerId: _require(fields['ID'], 'ID'),
-        firstName: _require(fields['First Name'], 'First Name'),
-        lastName: _require(fields['Last Name'], 'Last Name'),
-        gender: _require(fields['Gender'], 'Gender'),
-        dateOfBirth: _require(fields['Date of Birth'], 'Date of Birth'),
-        phoneNumber: _require(fields['Phone Number'], 'Phone Number'),
-        fullFarmerId: _parseString(fields['Farmer ID']),
-        farmerGardens: _parseString(fields['FarmerGardens']),
-        registeredFrom: _parseString(fields['Registered From']),
-        registeredDate: _parseString(fields['Registered']),
-        seasons: _parseStringList(fields['Seasons']),
-        yearOfRegistration: _parseString(fields['Year of registration']),
-        lastModified: _parseString(fields['last mod']),
+        id: record.id,
+        farmerId: farmerId,
+        firstName: firstName,
+        lastName: lastName,
+        gender: gender,
+        dateOfBirth:
+            fields['Date of Birth'] is String ? fields['Date of Birth'] : null,
+        phoneNumber:
+            fields['Phone Number'] is String ? fields['Phone Number'] : null,
+        fullFarmerId:
+            fields['Farmer ID'] is String ? fields['Farmer ID'] : null,
+        farmerGardens:
+            fields['FarmerGardens'] is String ? fields['FarmerGardens'] : null,
+        registeredFrom:
+            fields['Registered From'] is String
+                ? fields['Registered From']
+                : null,
+        registeredDate:
+            fields['Registered'] is String ? fields['Registered'] : null,
+        seasons:
+            fields['Seasons'] is List
+                ? (fields['Seasons'] as List).whereType<String>().toList()
+                : null,
+        yearOfRegistration:
+            fields['Year of registration'] is String
+                ? fields['Year of registration']
+                : null,
+        lastModified: fields['last mod'] is String ? fields['last mod'] : null,
       );
     } catch (e) {
       throw FarmerParsingException('Failed to parse Farmer from Airtable: $e');
@@ -68,22 +106,44 @@ class Farmer {
 
   factory Farmer.fromJson(Map<String, dynamic> json) {
     try {
+      final id = json['id'];
+      final farmerId = json['farmerId'];
+      final firstName = json['firstName'];
+      final lastName = json['lastName'];
+      final gender = json['gender'];
+
+      if (id == null || id is! String || id.trim().isEmpty) {
+        throw FarmerParsingException('id is required');
+      }
+      if (farmerId == null || farmerId is! String || farmerId.trim().isEmpty) {
+        throw FarmerParsingException('farmerId is required');
+      }
+      if (firstName == null ||
+          firstName is! String ||
+          firstName.trim().isEmpty) {
+        throw FarmerParsingException('firstName is required');
+      }
+      if (lastName == null || lastName is! String || lastName.trim().isEmpty) {
+        throw FarmerParsingException('lastName is required');
+      }
+      if (gender == null || gender is! String || gender.trim().isEmpty) {
+        throw FarmerParsingException('gender is required');
+      }
+
       return Farmer(
-        id: _require(json['id'], 'id'),
-        farmerId: _require(json['farmerId'], 'farmerId'),
-        firstName: _require(json['firstName'], 'firstName'),
-        lastName: _require(json['lastName'], 'lastName'),
-        gender: _require(json['gender'], 'gender'),
-        dateOfBirth: _require(json['dateOfBirth'], 'dateOfBirth'),
-        phoneNumber: _require(json['phoneNumber'], 'phoneNumber'),
+        id: id,
+        farmerId: farmerId,
+        firstName: firstName,
+        lastName: lastName,
+        gender: gender,
+        dateOfBirth: json['dateOfBirth'] as String?,
+        phoneNumber: json['phoneNumber'] as String?,
         fullFarmerId: json['fullFarmerId'] as String?,
         farmerGardens: json['farmerGardens'] as String?,
         registeredFrom: json['registeredFrom'] as String?,
         registeredDate: json['registeredDate'] as String?,
         seasons:
-            (json['seasons'] as List<dynamic>?)
-                ?.map((e) => e as String)
-                .toList(),
+            (json['seasons'] as List<dynamic>?)?.whereType<String>().toList(),
         yearOfRegistration: json['yearOfRegistration'] as String?,
         lastModified: json['lastModified'] as String?,
       );
@@ -109,27 +169,5 @@ class Farmer {
       'yearOfRegistration': yearOfRegistration,
       'lastModified': lastModified,
     };
-  }
-
-  // Helpers
-  static String _require(dynamic value, String field) {
-    if (value == null || value is! String || value.trim().isEmpty) {
-      throw FarmerParsingException(
-        '$field is required and must be a non-empty String',
-      );
-    }
-    return value;
-  }
-
-  static String? _parseString(dynamic value) => value is String ? value : null;
-
-  static List<String>? _parseStringList(dynamic value) {
-    if (value is List) {
-      return value
-          .where((e) => e is String && e.trim().isNotEmpty)
-          .map((e) => e as String)
-          .toList();
-    }
-    return null;
   }
 }

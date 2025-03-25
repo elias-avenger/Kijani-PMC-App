@@ -9,19 +9,21 @@ class GroupParsingException implements Exception {
 }
 
 class Group {
-  final String id;
-  final String name;
-  final String parishId;
-  final String coordinates;
-  final String? parish;
-  final int? no;
-  final int? seasonsCount;
+  final String id; // "ID" field
+  final String name; // "Group Name"
+  final String parishId; // "Parish ID"
+  final String coordinates; // First in "Coordinates"
+  final String? parish; // "Parish"
+  final int? no; // "No_"
+  final int? seasonsCount; // "Seasons_count"
+  final String recordId; // Airtable record.id
 
   Group({
     required this.id,
     required this.name,
     required this.parishId,
     required this.coordinates,
+    required this.recordId,
     this.parish,
     this.no,
     this.seasonsCount,
@@ -34,14 +36,46 @@ class Group {
         throw GroupParsingException('Fields map is null in Airtable record');
       }
 
+      final id = fields['ID'];
+      if (id == null || id is! String || id.trim().isEmpty) {
+        throw GroupParsingException(
+          '"ID" field is required and must be a non-empty String',
+        );
+      }
+
+      final name = fields['Group Name'];
+      if (name == null || name is! String) {
+        throw GroupParsingException(
+          '"Group Name" is required and must be a String',
+        );
+      }
+
+      final parishId = fields['Parish ID'];
+      if (parishId == null || parishId is! String) {
+        throw GroupParsingException(
+          '"Parish ID" is required and must be a String',
+        );
+      }
+
+      String coordinates = '';
+      if (fields['Coordinates'] is List &&
+          (fields['Coordinates'] as List).isNotEmpty) {
+        final coords = fields['Coordinates'] as List;
+        if (coords.first is String) {
+          coordinates = coords.first;
+        }
+      }
+
       return Group(
-        id: _requireString(record.id, 'Record ID'),
-        name: _requireString(fields['Group Name'], 'Group Name'),
-        parishId: _requireString(fields['Parish ID'], 'Parish ID'),
-        coordinates: _parseFirstStringInList(fields['Coordinates']),
-        parish: _parseOptionalString(fields['Parish']),
-        no: _parseOptionalInt(fields['No_']),
-        seasonsCount: _parseOptionalInt(fields['Seasons_count']),
+        id: id,
+        name: name,
+        parishId: parishId.trim(),
+        coordinates: coordinates,
+        parish: fields['Parish'] is String ? fields['Parish'] : null,
+        no: fields['No_'] is int ? fields['No_'] : null,
+        seasonsCount:
+            fields['Seasons_count'] is int ? fields['Seasons_count'] : null,
+        recordId: record.id,
       );
     } catch (e) {
       throw GroupParsingException('Failed to parse Group from Airtable: $e');
@@ -51,13 +85,14 @@ class Group {
   factory Group.fromJson(Map<String, dynamic> json) {
     try {
       return Group(
-        id: _requireString(json['id'], 'id'),
-        name: _requireString(json['name'], 'name'),
-        parishId: _requireString(json['parishId'], 'parishId'),
-        coordinates: _requireString(json['coordinates'], 'coordinates'),
-        parish: _parseOptionalString(json['parish']),
-        no: _parseOptionalInt(json['no']),
-        seasonsCount: _parseOptionalInt(json['seasonsCount']),
+        recordId: json['recordId'] ?? '',
+        id: json['id'] ?? '',
+        name: json['name'] ?? '',
+        parishId: json['parishId'] ?? '',
+        coordinates: json['coordinates'] ?? '',
+        parish: json['parish'],
+        no: json['no'],
+        seasonsCount: json['seasonsCount'],
       );
     } catch (e) {
       throw GroupParsingException('Failed to parse Group from JSON: $e');
@@ -66,6 +101,7 @@ class Group {
 
   Map<String, dynamic> toJson() {
     return {
+      'recordId': recordId,
       'id': id,
       'name': name,
       'parishId': parishId,
@@ -74,33 +110,5 @@ class Group {
       'no': no,
       'seasonsCount': seasonsCount,
     };
-  }
-
-  // Helper methods for parsing fields
-
-  static String _requireString(dynamic value, String field) {
-    if (value is String && value.trim().isNotEmpty) return value;
-    throw GroupParsingException(
-      '$field is required and must be a non-empty String',
-    );
-  }
-
-  static String _parseFirstStringInList(dynamic value) {
-    if (value is List && value.isNotEmpty && value.first is String) {
-      return value.first;
-    }
-    return '';
-  }
-
-  static String? _parseOptionalString(dynamic value) {
-    if (value == null) return null;
-    if (value is String) return value;
-    return null;
-  }
-
-  static int? _parseOptionalInt(dynamic value) {
-    if (value == null) return null;
-    if (value is int) return value;
-    return null;
   }
 }
