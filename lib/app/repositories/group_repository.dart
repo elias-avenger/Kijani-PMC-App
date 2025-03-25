@@ -14,6 +14,7 @@ class GroupRepository {
   Future<List<Group>?> fetchAndSaveParishGroups(String parishCode) async {
     try {
       List<String> groupAirtableFields = [
+        'ID',
         'Coordinates',
         'Group Name',
         'Parish ID',
@@ -139,4 +140,6 @@ class GroupRepository {
       if (kDebugMode) print('Error clearing groups: $e');
     }
   }
+
+  fetchAndSaveGroupFarmers(String id) {}
 }

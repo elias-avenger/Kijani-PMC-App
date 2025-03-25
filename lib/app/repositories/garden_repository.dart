@@ -66,7 +66,7 @@ class GardenRepository {
     try {
       String filter = '{Farmer ID} = "$farmerId"';
       if (kDebugMode) {
-        print('Fetching gardens for farmer: $farmerId with filter: $filter');
+        print('Fetching gardens for farmer: $farmerId withy filter: $filter');
       }
 
       List<AirtableRecord> records = await uGGardens.fetchRecordsWithFilter(

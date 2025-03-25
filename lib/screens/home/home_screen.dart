@@ -8,7 +8,7 @@ import 'package:kijani_pgc_app/app/services/local_storage.dart';
 import 'package:kijani_pgc_app/utils/constants/storage_keys.dart';
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Parish IDs: ${user.parishesIDs}',
+            'Parishes IDs: ${user.parishesIDs.split(',').length}',
             style: const TextStyle(fontSize: 16, color: Colors.white70),
           ),
           const SizedBox(height: 4),
@@ -116,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icon(Icons.info_outline, color: Colors.grey[600]),
                 const SizedBox(width: 8),
                 Text(
-                  'No groups available yet. Try updating data.',
+                  'No groups available',
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
               ],
@@ -161,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          'No groups found for this parish.',
+                          'No groups found',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
