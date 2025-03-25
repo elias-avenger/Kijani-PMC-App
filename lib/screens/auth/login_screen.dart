@@ -72,7 +72,6 @@ class LoginScreen extends StatelessWidget {
                       CustomTextField(
                         label: "Your Code",
                         controller: controller.codeController,
-                        obscureText: true,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
                             return "Code is required!";
