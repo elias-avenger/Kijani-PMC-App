@@ -32,9 +32,7 @@ class UserController extends GetxController {
     User? localUser = await userRepo.fetchLocalUser();
     if (localUser != null) {
       currentUser.value = localUser;
-      // TODO: Fetch user's parishes data here if needed
-      // Example: await fetchParishesData(localUser.branch);
-      Get.offAllNamed('/home'); // Navigate to home screen
+      Get.offAllNamed('/home');
     } else {
       currentUser.value = null;
     }
@@ -67,9 +65,9 @@ class UserController extends GetxController {
       }
     } else {
       Get.snackbar(
-        "Error",
-        "Invalid email or code",
-        snackPosition: SnackPosition.BOTTOM,
+        "Invalid Credentials",
+        "Please check your email and code !",
+        snackPosition: SnackPosition.TOP,
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -78,11 +76,7 @@ class UserController extends GetxController {
 
   // Logout method to clear user data
   Future<void> logout() async {
-    await storageService.deleteEntity(
-      kUserDataKey,
-      'current',
-    ); // Remove user data
-    // Alternative: await storageService.clearAll(); // Clears everything
+    await storageService.clearAll();
     currentUser.value = null;
     Get.offAllNamed('/login'); // Navigate back to login screen
   }
